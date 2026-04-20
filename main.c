@@ -8,17 +8,16 @@ const char QUEEN[] = "queen";
 const char JACK[] = "jack";
 const char NONE[] = "none";
 
+const int DRAWN = -1;
+
 
 typedef struct card_s {
-    char suit[9];
+    char suit[9], face[9];
     int value;
-    char face[9];
 } card;
 
 void assign_suit(card *deck, const char *suit, const int index) {
-    int king = 0;
-    int queen = 0;
-    int jack = 0;
+    int king = 0, queen = 0, jack = 0;
 
     for (int i = index; i < index + 13; i++) {
         strcpy(deck[i].suit, suit);
@@ -46,24 +45,33 @@ void assign_suit(card *deck, const char *suit, const int index) {
 }
 
 void print_deck(card *deck) {
-    for (int i = 0; i < 52; i++) {
-        if (strcmp(deck[i].face, NONE) != 0) {
-            printf("%s of %s\n", deck[i].face, deck[i].suit);
-        } else {
-            printf("%d of %s\n", deck[i].value, deck[i].suit);
-        }
+    for (int i = 0; i < sizeof(deck) / sizeof(deck[0]); i++) {
+        if (strcmp(deck[i].face, NONE) != 0) printf("%s of %s\n", deck[i].face, deck[i].suit);
+        else printf("%d of %s\n", deck[i].value, deck[i].suit);
     }
 }
 
 void shuffle_deck(card *deck) {
     for (int i = 0; i < 52; i++) {
-        int oldPos = rand() % 52;
-        int newPos = rand() % 52;
+        const int oldPos = rand() % 52, newPos = rand() % 52;
 
         const card temp = deck[oldPos];
         deck[oldPos] = deck[newPos];
         deck[newPos] = temp;
     }
+}
+
+card draw(card *deck) {
+    int val = rand() % 52;
+    card temp = deck[val];
+
+    while (temp.value == DRAWN) {
+        val = rand() % 52;
+        temp = deck[val];
+    }
+
+    deck[val].value = DRAWN;
+    return temp;
 }
 
 
