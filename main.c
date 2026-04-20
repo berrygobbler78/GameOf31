@@ -106,6 +106,8 @@ int check_hand(card *hand, int hand_len) {
 int main(void) {
     srand(time(0));
     card deck[52];
+    card *p1_hand = NULL, *p2_hand = NULL;
+    int p1_len = 0, p2_len = 0;
 
     assign_suit(deck, "hearts", 0);
     assign_suit(deck, "clubs", 13);
