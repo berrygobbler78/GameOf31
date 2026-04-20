@@ -164,6 +164,12 @@ void init(card deck[]){
     shuffle_deck(deck);
 }
 
+void clear_stream(void)
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+}
+
 int main(void) {
     srand(time(0));
     card deck[52];
