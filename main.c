@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 const char ACE[] = "ace";
 const char KING[] = "king";
@@ -76,6 +77,7 @@ card draw(card *deck) {
 
 
 int main(void) {
+    srand(time(0));
     card deck[52];
 
     assign_suit(deck, "hearts", 0);
