@@ -133,7 +133,7 @@ void draw(card *deck, card **hand, int *hand_len) {
         // TODO: Add better interface for picking Ace val
         int input;
         do {
-            slow_printf("Enter value for ACE (1 or 11)\n");
+            printf("Enter value for ACE (1 or 11)\n");
             scanf("%d", &input);
         } while (input != 1 && input != 11);
 
