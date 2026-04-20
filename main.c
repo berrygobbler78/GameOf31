@@ -191,35 +191,44 @@ int main(void) {
         players[i] = NULL;
         player_len[i] = 0;
     }
-    for(int i = 0;i < playercount + 1;i++){
-        if(i == 0){
-            //Dealer Logic
-        }else{
-            printf("Player %d's turn:\n",i);
-            while (1) {
-                draw(deck, &players[i], &playerhand[i]);
-                switch (check_hand(players[i], playerhand[i])) {
-                //case NO_WIN: slow_printf("No win\n"); break;    Feels unneccessary, can change back
-                case HAS_14: slow_printf("Hit 14\n"); break;
-                case HAS_31: slow_printf("Hit 31\n"); break;
-                case OVER_31: slow_printf("Over 31\n"); break;
-            }
 
-            print_cards(players[i], playerhand[i]);
-            printf("Total value: %d\n",hand_value(players[i], playerhand[i]));
+    // game loop
+    int run = -1;
+    while (run == -1) {
+        for (int i = 0; i < player_count; i++) {
+            draw(deck, &players[i], &player_len[i]);
+            print_cards(players[i], player_len[i]);
 
-            int temp;
-            fast_printf("Continue? (1 for yes, 0 for no)\n");
-            if (scanf("%d", &temp) == 0 || temp == 0) break;
+            switch (check_hand(players[i], player_len[i])) {
+                case NO_WIN: continue;
+                case HAS_14:
+                    printf("Player %d hit a 14\n", i + 1);
+                    run++;
+                    break;
+                case HAS_31:
+                    printf("Player %d hit a 31\n", i + 1);
+                    run++;
+                    break;
+                case OVER_31:
+                    printf("Over 31\n");
+                    run++;
+                    break;
             }
-            printf("Player %d's turn is over\n",i);
         }
-       
+
+        if (run != -1) break;
+
+        printf("Dealer draws...\n");
+        printf("Draw again? (y/n)\n");
+        char input;
+        do {
+            scanf(" %c", &input);
+        } while (input != 'y' && input != 'n');
+        if (input == 'n') break;
+
     }
-    
-    for(int i = 0; i < playercount+1;i++){
-        free(players[i]);
-    }
+
+    for (int i = 0; i < player_count; i++) free(players[i]);
 
     return 0;
 }
