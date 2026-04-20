@@ -114,9 +114,22 @@ int main(void) {
     assign_suit(deck, "spades", 26);
     assign_suit(deck, "diamonds", 39);
 
-    print_deck(deck);
-    shuffle_deck(deck);
-    print_deck(deck);
+    while (1) {
+        draw(deck, &p1_hand, &p1_len);
+        switch (check_hand(p1_hand, p1_len)) {
+            case NO_WIN: printf("No win\n"); break;
+            case HAS_14: printf("Hit 14\n"); break;
+            case HAS_31: printf("Hit 31\n"); break;
+            case OVER_31: printf("Over 31\n"); break;
+        }
+
+        print_cards(p1_hand, p1_len);
+
+        int temp;
+        scanf("%d", &temp);
+    }
+
+    free(p1_hand);
 
     return 0;
 }
