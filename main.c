@@ -184,13 +184,12 @@ int main(void) {
         scanf("%d", &player_count);
     } while (player_count < 1);
 
-    slow_printf("Game of 31, how many players? ");
-    scanf("%d",&playercount);
-    card *players[playercount + 1];
-    int playerhand[playercount + 1];
-    for(int i = 0; i < playercount + 1;i++){
+    card *players[player_count];
+    int player_len[player_count];
+
+    for (int i = 0; i < player_count; i++) {
         players[i] = NULL;
-        playerhand[i] = 0;
+        player_len[i] = 0;
     }
     for(int i = 0;i < playercount + 1;i++){
         if(i == 0){
