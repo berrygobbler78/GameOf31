@@ -24,47 +24,6 @@ typedef struct card_s {
     int value;
 } card;
 
-void delay(int milliseconds)
-{
-    long pause;
-    clock_t now,then;
-
-    pause = milliseconds*(CLOCKS_PER_SEC/1000);
-    now = then = clock();
-    while( (now-then) < pause ) now = clock();
-}
-
-void slow_printf(char *message) {
-    for (int i = 0; i < strlen(message); i++) {
-        putchar(message[i]);
-        if (message[i] != '\n') {
-            putchar('|'); // To mimic a cursor
-            fflush(stdout); // Ensures char is printed immediately
-            delay(100 + rand() % 101); // Delay between two vals
-            putchar('\b'); // 'backspace' removes '|'
-            fflush(stdout);
-        } else {
-            fflush(stdout);
-            delay(100 + rand() % 201);
-        }
-    }
-}
-
-void fast_printf(char *message) {
-    for (int i = 0; i < strlen(message); i++) {
-        putchar(message[i]);
-        if (message[i] != '\n') {
-            putchar('|'); // To mimic a cursor
-            fflush(stdout); // Ensures char is printed immediately
-            delay(50 + rand() % 51); // Delay between two vals
-            putchar('\b'); // 'backspace' removes '|'
-            fflush(stdout);
-        } else {
-            fflush(stdout);
-            delay(100 + rand() % 201);
-        }
-    }
-}
 int hand_value(card *hand, int len){
     int sum = 0;
     for(int i = 0 ;i < len;i++){
