@@ -62,17 +62,21 @@ void shuffle_deck(card *deck) {
     }
 }
 
-card draw(card *deck) {
-    int val = rand() % 52;
-    card temp = deck[val];
+void draw(card *deck, card **hand, int *hand_len) {
+    card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
+    *hand = temp_hand;
 
-    while (temp.value == DRAWN) {
+    int val;
+    card temp;
+
+    do {
         val = rand() % 52;
         temp = deck[val];
     }
 
     deck[val].value = DRAWN;
-    return temp;
+    (*hand)[*hand_len] = temp;
+    *hand_len += 1;
 }
 
 
