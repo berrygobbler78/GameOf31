@@ -172,12 +172,17 @@ void clear_stream(void)
 
 int main(void) {
     srand(time(0));
+
+    // deck setup
     card deck[52];
-    card *p1_hand = NULL, *p2_hand = NULL;
-    int p1_len = 0, p2_len = 0, playercount;
     init(deck);
-    
-    //slow_printf("Hello world\n");
+
+    // player setup
+    int player_count = 0;
+    do {
+        printf("Enter number of players:\n");
+        scanf("%d", &player_count);
+    } while (player_count < 1);
 
     slow_printf("Game of 31, how many players? ");
     scanf("%d",&playercount);
