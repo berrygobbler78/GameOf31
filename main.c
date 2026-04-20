@@ -45,7 +45,7 @@ void assign_suit(card *deck, const char *suit, const int index) {
 }
 
 void print_deck(card *deck) {
-    for (int i = 0; i < sizeof(deck) / sizeof(deck[0]); i++) {
+    for (int i = 0; i < 52; i++) {
         if (strcmp(deck[i].face, NONE) != 0) printf("%s of %s\n", deck[i].face, deck[i].suit);
         else printf("%d of %s\n", deck[i].value, deck[i].suit);
     }
