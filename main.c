@@ -96,13 +96,33 @@ void assign_suit(card *deck, const char *suit, const int index) {
 }
 
 void print_cards(card *cards, const int deck_len) {
-    for (int i = 0; i < deck_len; i++) {
-        
-    }
     for(int i = 0; i < deck_len;i++){
         char icon[10];
         char msg[100];
        
+        if(strcmp(cards[i].suit,"hearts") == 0) strcpy(icon,"\u2665");
+        if(strcmp(cards[i].suit,"clubs") == 0) strcpy(icon,"\u2663");
+        if(strcmp(cards[i].suit,"spades") == 0) strcpy(icon,"\u2660");
+        if(strcmp(cards[i].suit,"diamonds") == 0) strcpy(icon,"\u2666");
+        if(strcmp(cards[i].face,NONE) != 0){
+            printf("┌─────┐\n│%c    │\n│  %s  │\n│    %c│\n└─────┘\n",toupper(cards[i].face[0]),icon,toupper(cards[i].face[0]));
+        }else if(cards[i].value == 10){
+           printf("┌─────┐\n│%d   │\n│  %s  │\n│   %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
+        }else{
+           printf("┌─────┐\n│%d    │\n│  %s  │\n│    %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
+
+        }
+        if (strcmp(cards[i].face, NONE) != 0) sprintf(msg, "%s of %s\n", cards[i].face, cards[i].suit);
+        else sprintf(msg, "%d of %s\n", cards[i].value, cards[i].suit);
+        slow_printf(msg);
+    }
+}
+void print_dealer_cards(card *cards, const int deck_len){
+    char icon[10];
+    char msg[100];
+    printf("┌─────┐\n│     │\n│     │\n│     │\n└─────┘\n");
+    slow_printf("Face down card");
+    for(int i = 1;i < deck_len;i++){
         if(strcmp(cards[i].suit,"hearts") == 0) strcpy(icon,"\u2665");
         if(strcmp(cards[i].suit,"clubs") == 0) strcpy(icon,"\u2663");
         if(strcmp(cards[i].suit,"spades") == 0) strcpy(icon,"\u2660");
@@ -131,7 +151,7 @@ void shuffle_deck(card *deck) {
     }
 }
 
-void draw(card *deck, card **hand, int *hand_len) {
+void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
     if (*hand_len >= 52) {
         slow_printf("No more cards in the deck.\n");
         return;
@@ -149,6 +169,10 @@ void draw(card *deck, card **hand, int *hand_len) {
 
     if (strcmp(temp.face, ACE) == 0) {
         // TODO: Add better interface for picking Ace val
+        if (is_dealer) {
+            int current = hand_value(*hand, *hand_len);
+            temp.value = (current + 11 <= 31) ? 11 : 1;
+        } else {
         int input;
         do {
             slow_printf("Enter value for ACE (1 or 11)\n");
@@ -156,12 +180,49 @@ void draw(card *deck, card **hand, int *hand_len) {
         } while (input != 1 && input != 11);
 
         temp.value = input;
-
+    }
     }
 
     deck[val].value = DRAWN;
     (*hand)[*hand_len] = temp;
     *hand_len += 1;
+}
+void dealer_turn(card *deck, card **hand, int *hand_len) {
+    slow_printf("Dealer's turn...\n");
+    
+    while (1) {
+        draw(deck, hand, hand_len,1);
+        int result = hand_value(*hand,*hand_len);
+        
+        if (result == OVER_31) {
+            slow_printf("Dealer busts! All players win!\n");
+            print_cards(*hand, *hand_len);
+            return;
+        }
+        if (result == HAS_31) {
+            slow_printf("Dealer hits 31!\n");
+            print_cards(*hand, *hand_len);
+            return;
+        }
+        if (result == HAS_14) {
+            slow_printf("Dealer hits 14, must stop.\n");
+            print_cards(*hand, *hand_len);  // Reveal all
+            return;
+        }
+        
+        // Dealer's strategy: stop at 26+
+        if (hand_value(*hand, *hand_len) >= 26) {
+            slow_printf("Dealer stands.\n");
+            // Reveal all except last card
+            print_cards(*hand, *hand_len - 1);
+            printf("┌─────┐\n│     │\n│     │\n│     │\n└─────┘\n");
+            slow_printf("[ FACE DOWN ]\n");
+            return;
+        }
+    }
+}
+void compare_hands(card* players[],int playerhand){
+    //TODO compare obv
 }
 
 int check_hand(card *hand, int hand_len) {
@@ -201,11 +262,11 @@ int main(void) {
     }
     for(int i = 0;i < playercount + 1;i++){
         if(i == 0){
-            //Dealer Logic
+            dealer_turn(deck,&players[i],&playerhand[i]);
         }else{
             printf("Player %d's turn:\n",i);
             while (1) {
-                draw(deck, &players[i], &playerhand[i]);
+                draw(deck, &players[i], &playerhand[i],0);
                 switch (check_hand(players[i], playerhand[i])) {
                 //case NO_WIN: slow_printf("No win\n"); break;    Feels unneccessary, can change back
                 case HAS_14: slow_printf("Hit 14\n"); break;
@@ -224,7 +285,7 @@ int main(void) {
         }
        
     }
-    
+    compare_hands(players,playercount);
     for(int i = 0; i < playercount+1;i++){
         free(players[i]);
     }
