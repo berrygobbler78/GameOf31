@@ -115,7 +115,7 @@ void shuffle_deck(card *deck) {
 
 void draw(card *deck, card **hand, int *hand_len) {
     if (*hand_len >= 52) {
-        slow_printf("No more cards in the deck.\n");
+        printf("No more cards in the deck.\n");
         return;
     }
     card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
