@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
 #define NO_WIN -1
@@ -16,6 +17,48 @@ typedef struct card_s {
     char suit[9], face[9];
     int value;
 } card;
+
+void delay(int milliseconds)
+{
+    long pause;
+    clock_t now,then;
+
+    pause = milliseconds*(CLOCKS_PER_SEC/1000);
+    now = then = clock();
+    while( (now-then) < pause ) now = clock();
+}
+
+void slow_printf(char *message) {
+    for (int i = 0; i < strlen(message); i++) {
+        putchar(message[i]);
+        if (message[i] != '\n') {
+            putchar('|'); // To mimic a cursor
+            fflush(stdout); // Ensures char is printed immediately
+            delay(100 + rand() % 101); // Delay between two vals
+            putchar('\b'); // 'backspace' removes '|'
+            fflush(stdout);
+        } else {
+            fflush(stdout);
+            delay(100 + rand() % 201);
+        }
+    }
+}
+
+void fast_printf(char *message) {
+    for (int i = 0; i < strlen(message); i++) {
+        putchar(message[i]);
+        if (message[i] != '\n') {
+            putchar('|'); // To mimic a cursor
+            fflush(stdout); // Ensures char is printed immediately
+            delay(50 + rand() % 51); // Delay between two vals
+            putchar('\b'); // 'backspace' removes '|'
+            fflush(stdout);
+        } else {
+            fflush(stdout);
+            delay(100 + rand() % 201);
+        }
+    }
+}
 
 void assign_suit(card *deck, const char *suit, const int index) {
     int king = 0, queen = 0, jack = 0;
@@ -47,8 +90,10 @@ void assign_suit(card *deck, const char *suit, const int index) {
 
 void print_cards(card *cards, const int deck_len) {
     for (int i = 0; i < deck_len; i++) {
-        if (strcmp(cards[i].face, NONE) != 0) printf("%s of %s\n", cards[i].face, deck[i].suit);
-        else printf("%d of %s\n", cards[i].value, cards[i].suit);
+        char msg[100];
+        if (strcmp(cards[i].face, NONE) != 0) sprintf(msg, "%s of %s\n", cards[i].face, cards[i].suit);
+        else sprintf(msg, "%d of %s\n", cards[i].value, cards[i].suit);
+        slow_printf(msg);
     }
 }
 
@@ -63,6 +108,10 @@ void shuffle_deck(card *deck) {
 }
 
 void draw(card *deck, card **hand, int *hand_len) {
+    if (*hand_len >= 52) {
+        slow_printf("No more cards in the deck.\n");
+        return;
+    }
     card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
     *hand = temp_hand;
 
@@ -78,7 +127,7 @@ void draw(card *deck, card **hand, int *hand_len) {
         // TODO: Add better interface for picking Ace val
         int input;
         do {
-            printf("Enter value for ACE (1 or 11)\n");
+            slow_printf("Enter value for ACE (1 or 11)\n");
             scanf("%d", &input);
         } while (input != 1 && input != 11);
 
@@ -109,27 +158,33 @@ int main(void) {
     card *p1_hand = NULL, *p2_hand = NULL;
     int p1_len = 0, p2_len = 0;
 
+    slow_printf("Hello world\n");
+
     assign_suit(deck, "hearts", 0);
     assign_suit(deck, "clubs", 13);
     assign_suit(deck, "spades", 26);
     assign_suit(deck, "diamonds", 39);
 
+    shuffle_deck(deck);
+
     while (1) {
         draw(deck, &p1_hand, &p1_len);
         switch (check_hand(p1_hand, p1_len)) {
-            case NO_WIN: printf("No win\n"); break;
-            case HAS_14: printf("Hit 14\n"); break;
-            case HAS_31: printf("Hit 31\n"); break;
-            case OVER_31: printf("Over 31\n"); break;
+            case NO_WIN: slow_printf("No win\n"); break;
+            case HAS_14: slow_printf("Hit 14\n"); break;
+            case HAS_31: slow_printf("Hit 31\n"); break;
+            case OVER_31: slow_printf("Over 31\n"); break;
         }
 
         print_cards(p1_hand, p1_len);
 
         int temp;
-        scanf("%d", &temp);
+        fast_printf("Continue? (1 for yes, 0 for no)\n");
+        if (scanf("%d", &temp) == 0 || temp == 0) break;
     }
 
     free(p1_hand);
+    if (p2_hand) free(p2_hand);
 
     return 0;
 }
