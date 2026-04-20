@@ -3,11 +3,11 @@
 #include <string.h>
 #include <time.h>
 
-const char ACE[] = "ace";
-const char KING[] = "king";
-const char QUEEN[] = "queen";
-const char JACK[] = "jack";
-const char NONE[] = "none";
+const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
+#define NO_WIN -1
+#define HAS_14 0
+#define HAS_31 1
+#define OVER_31 2
 
 const int DRAWN = -1;
 
