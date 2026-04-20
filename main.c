@@ -4,15 +4,20 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
-
+// default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
-#define NO_WIN -1
+const char HEARTS[] = "hearts", SPADES[] = "spades", DIAMONDS[] = "diamonds", CLUBS[] = "clubs";
+
+// card graphics
+const char TOP[] = "┌─────┐", BOTTOM[] = "└─────┘";
+
+// win conditions
+#define NO_WIN (-1)
 #define HAS_14 0
 #define HAS_31 1
 #define OVER_31 2
 
-const int DRAWN = -1;
-
+#define DRAWN (-1)
 
 typedef struct card_s {
     char suit[9], face[9];
