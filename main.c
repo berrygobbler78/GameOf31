@@ -91,6 +91,17 @@ void draw(card *deck, card **hand, int *hand_len) {
     *hand_len += 1;
 }
 
+int check_hand(card *hand, int hand_len) {
+    int total = 0;
+    for (int i = 0; i < hand_len; i++) total += hand[i].value;
+
+    if (total == 31) return HAS_31;
+    if (total == 14) return HAS_14;
+    if (total > 31) return OVER_31;
+
+    return NO_WIN;
+}
+
 
 int main(void) {
     srand(time(0));
