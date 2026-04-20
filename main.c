@@ -72,6 +72,18 @@ void draw(card *deck, card **hand, int *hand_len) {
     do {
         val = rand() % 52;
         temp = deck[val];
+    } while (temp.value == DRAWN);
+
+    if (strcmp(temp.face, ACE) == 0) {
+        // TODO: Add better interface for picking Ace val
+        int input;
+        do {
+            printf("Enter value for ACE (1 or 11)\n");
+            scanf("%d", &input);
+        } while (input != 1 && input != 11);
+
+        temp.value = input;
+
     }
 
     deck[val].value = DRAWN;
