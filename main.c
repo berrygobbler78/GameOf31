@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <ctype.h>
 
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
 #define NO_WIN -1
@@ -59,7 +60,13 @@ void fast_printf(char *message) {
         }
     }
 }
-
+int hand_value(card *hand, int len){
+    int sum = 0;
+    for(int i = 0 ;i < len;i++){
+        sum += hand[i].value;
+    }
+    return sum;
+}
 void assign_suit(card *deck, const char *suit, const int index) {
     int king = 0, queen = 0, jack = 0;
 
@@ -90,7 +97,21 @@ void assign_suit(card *deck, const char *suit, const int index) {
 
 void print_cards(card *cards, const int deck_len) {
     for (int i = 0; i < deck_len; i++) {
+        
+    }
+    for(int i = 0; i < deck_len;i++){
+        char icon[10];
         char msg[100];
+       
+        if(strcmp(cards[i].suit,"hearts") != 0) strcpy(icon,"\u2665");
+        if(strcmp(cards[i].suit,"clubs") != 0) strcpy(icon,"\u2663");
+        if(strcmp(cards[i].suit,"spades") != 0) strcpy(icon,"\u2660");
+        if(strcmp(cards[i].suit,"diamonds") != 0) strcpy(icon,"\u2666");
+        if(strcmp(cards[i].face,NONE) != 0){
+            printf("┌─────┐\n│%c    │\n│  %s  │\n│    %c│\n└─────┘\n",toupper(cards[i].face[0]),icon,toupper(cards[i].face[0]));
+        }else{
+           printf("┌─────┐\n│%d    │\n│  %s  │\n│    %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
+        }
         if (strcmp(cards[i].face, NONE) != 0) sprintf(msg, "%s of %s\n", cards[i].face, cards[i].suit);
         else sprintf(msg, "%d of %s\n", cards[i].value, cards[i].suit);
         slow_printf(msg);
@@ -150,22 +171,24 @@ int check_hand(card *hand, int hand_len) {
 
     return NO_WIN;
 }
-
+void init(card deck[]){
+    assign_suit(deck, "hearts", 0);
+    assign_suit(deck, "clubs", 13);
+    assign_suit(deck, "spades", 26);
+    assign_suit(deck, "diamonds", 39);
+    shuffle_deck(deck);
+}
 
 int main(void) {
     srand(time(0));
     card deck[52];
     card *p1_hand = NULL, *p2_hand = NULL;
     int p1_len = 0, p2_len = 0;
+    init(deck);
+   
+    //slow_printf("Hello world\n");
 
-    slow_printf("Hello world\n");
-
-    assign_suit(deck, "hearts", 0);
-    assign_suit(deck, "clubs", 13);
-    assign_suit(deck, "spades", 26);
-    assign_suit(deck, "diamonds", 39);
-
-    shuffle_deck(deck);
+    
 
     while (1) {
         draw(deck, &p1_hand, &p1_len);
@@ -177,6 +200,7 @@ int main(void) {
         }
 
         print_cards(p1_hand, p1_len);
+        printf("Total value: %d\n",hand_value(p1_hand,p1_len));
 
         int temp;
         fast_printf("Continue? (1 for yes, 0 for no)\n");
