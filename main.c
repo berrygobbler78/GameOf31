@@ -4,62 +4,27 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
+
 // default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
-#define NO_WIN -1
+const char HEARTS[] = "hearts", SPADES[] = "spades", DIAMONDS[] = "diamonds", CLUBS[] = "clubs";
+
+// card graphics
+const char TOP[] = "┌─────┐", BOTTOM[] = "└─────┘";
+
+// win conditions
+#define NO_WIN (-1)
 #define HAS_14 0
 #define HAS_31 1
 #define OVER_31 2
 
-const int DRAWN = -1;
-
+#define DRAWN (-1)
 
 typedef struct card_s {
     char suit[9], face[9];
     int value;
 } card;
 
-void delay(int milliseconds)
-{
-    long pause;
-    clock_t now,then;
-
-    pause = milliseconds*(CLOCKS_PER_SEC/1000);
-    now = then = clock();
-    while( (now-then) < pause ) now = clock();
-}
-
-void slow_printf(char *message) {
-    for (int i = 0; i < strlen(message); i++) {
-        putchar(message[i]);
-        if (message[i] != '\n') {
-            putchar('|'); // To mimic a cursor
-            fflush(stdout); // Ensures char is printed immediately
-            delay(100 + rand() % 101); // Delay between two vals
-            putchar('\b'); // 'backspace' removes '|'
-            fflush(stdout);
-        } else {
-            fflush(stdout);
-            delay(100 + rand() % 201);
-        }
-    }
-}
-
-void fast_printf(char *message) {
-    for (int i = 0; i < strlen(message); i++) {
-        putchar(message[i]);
-        if (message[i] != '\n') {
-            putchar('|'); // To mimic a cursor
-            fflush(stdout); // Ensures char is printed immediately
-            delay(50 + rand() % 51); // Delay between two vals
-            putchar('\b'); // 'backspace' removes '|'
-            fflush(stdout);
-        } else {
-            fflush(stdout);
-            delay(100 + rand() % 201);
-        }
-    }
-}
 int hand_value(card *hand, int len){
     int sum = 0;
     for(int i = 0 ;i < len;i++){
@@ -111,11 +76,12 @@ void print_cards(card *cards, const int len) {
     printf("\n");
 
     for (int i = 0; i < len; i++) {
-        char icon[10];
-        if(strcmp(cards[i].suit,"hearts") != 0) strcpy(icon,"\u2665");
-        else if(strcmp(cards[i].suit,"clubs") != 0) strcpy(icon,"\u2663");
-        else if(strcmp(cards[i].suit,"spades") != 0) strcpy(icon,"\u2660");
-        else if(strcmp(cards[i].suit,"diamonds") != 0) strcpy(icon,"\u2666");
+        const char *icon;
+        if (strcmp(cards[i].suit, HEARTS) == 0) icon = "♥";
+        else if (strcmp(cards[i].suit, CLUBS) == 0) icon = "♣";
+        else if (strcmp(cards[i].suit, SPADES) == 0) icon = "♠";
+        else if (strcmp(cards[i].suit, DIAMONDS) == 0) icon = "♦";
+        else icon = "?";
 
         printf("│  %s  │ ", icon);
     }
@@ -151,7 +117,7 @@ void shuffle_deck(card *deck) {
 
 void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
     if (*hand_len >= 52) {
-        slow_printf("No more cards in the deck.\n");
+        printf("No more cards in the deck.\n");
         return;
     }
     card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
@@ -170,57 +136,57 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
         if (is_dealer) {
             int current = hand_value(*hand, *hand_len);
             temp.value = (current + 11 <= 31) ? 11 : 1;
-        } else {
-        int input;
-        do {
-            slow_printf("Enter value for ACE (1 or 11)\n");
-            scanf("%d", &input);
-        } while (input != 1 && input != 11);
+        }
+        else {
+            int input;
+            do {
+                printf("Enter value for ACE (1 or 11)\n");
+                scanf("%d", &input);
+            } while (input != 1 && input != 11);
 
-        temp.value = input;
-    }
+            temp.value = input;
+        }
+
     }
 
     deck[val].value = DRAWN;
     (*hand)[*hand_len] = temp;
     *hand_len += 1;
 }
+
 void dealer_turn(card *deck, card **hand, int *hand_len) {
-    slow_printf("Dealer's turn...\n");
-    
+    printf("Dealer's turn...\n");
+
     while (1) {
         draw(deck, hand, hand_len,1);
         int result = hand_value(*hand,*hand_len);
-        
+
         if (result == OVER_31) {
-            slow_printf("Dealer busts! All players win!\n");
+            printf("Dealer busts! All players win!\n");
             print_cards(*hand, *hand_len);
             return;
         }
         if (result == HAS_31) {
-            slow_printf("Dealer hits 31!\n");
+            printf("Dealer hits 31!\n");
             print_cards(*hand, *hand_len);
             return;
         }
         if (result == HAS_14) {
-            slow_printf("Dealer hits 14, must stop.\n");
+            printf("Dealer hits 14, must stop.\n");
             print_cards(*hand, *hand_len);  // Reveal all
             return;
         }
-        
+
         // Dealer's strategy: stop at 26+
         if (hand_value(*hand, *hand_len) >= 26) {
-            slow_printf("Dealer stands.\n");
+            printf("Dealer stands.\n");
             // Reveal all except last card
             print_cards(*hand, *hand_len - 1);
             printf("┌─────┐\n│     │\n│     │\n│     │\n└─────┘\n");
-            slow_printf("[ FACE DOWN ]\n");
+            printf("[ FACE DOWN ]\n");
             return;
         }
     }
-}
-void compare_hands(card* players[],int playerhand){
-    //TODO compare obv
 }
 
 int check_hand(card *hand, int hand_len) {
@@ -233,6 +199,7 @@ int check_hand(card *hand, int hand_len) {
 
     return NO_WIN;
 }
+
 void init(card deck[]){
     assign_suit(deck, "hearts", 0);
     assign_suit(deck, "clubs", 13);
@@ -243,50 +210,56 @@ void init(card deck[]){
 
 int main(void) {
     srand(time(0));
-    card deck[52];
-    card *p1_hand = NULL, *p2_hand = NULL;
-    int p1_len = 0, p2_len = 0, playercount;
-    init(deck);
-    
-    //slow_printf("Hello world\n");
 
-    slow_printf("Game of 31, how many players? ");
-    scanf("%d",&playercount);
-    card *players[playercount + 1];
-    int playerhand[playercount + 1];
-    for(int i = 0; i < playercount + 1;i++){
+    // deck setup
+    card deck[52];
+    init(deck);
+
+    // player setup
+    int player_count = 0;
+    do {
+        printf("Enter number of players:\n");
+        scanf("%d", &player_count);
+    } while (player_count < 1);
+
+    player_count++;
+
+    card *players[player_count];
+    int player_len[player_count];
+
+    for (int i = 0; i < player_count; i++) {
         players[i] = NULL;
-        playerhand[i] = 0;
+        player_len[i] = 0;
     }
-    for(int i = 0;i < playercount + 1;i++){
+
+    for (int i = 0; i < player_count; i++){
         if(i == 0){
-            dealer_turn(deck,&players[i],&playerhand[i]);
-        }else{
-            printf("Player %d's turn:\n",i);
-            while (1) {
-                draw(deck, &players[i], &playerhand[i],0);
-                switch (check_hand(players[i], playerhand[i])) {
-                //case NO_WIN: slow_printf("No win\n"); break;    Feels unneccessary, can change back
-                case HAS_14: slow_printf("Hit 14\n"); break;
-                case HAS_31: slow_printf("Hit 31\n"); break;
-                case OVER_31: slow_printf("Over 31\n"); break;
+            dealer_turn(deck,&players[i],&player_len[i]);
+            continue;
+        }
+
+        printf("Player %d's turn:\n",i);
+        int win = -1;
+        while (1) {
+            draw(deck, &players[i], &player_len[i],0);
+            switch (check_hand(players[i], player_len[i])) {
+                case HAS_14: printf("Hit 14\n"); win = 1; break;
+                case HAS_31: printf("Hit 31\n"); win = 1; break;
+                case OVER_31: printf("Over 31\n"); win = 1; break;
             }
 
-            print_cards(players[i], playerhand[i]);
-            printf("Total value: %d\n",hand_value(players[i], playerhand[i]));
+            if (win != -1) break;
+
+            print_cards(players[i], player_len[i]);
 
             int temp;
-            fast_printf("Continue? (1 for yes, 0 for no)\n");
+            printf("Continue? (1 for yes, 0 for no)\n");
             if (scanf("%d", &temp) == 0 || temp == 0) break;
-            }
-            printf("Player %d's turn is over\n",i);
         }
-       
+        printf("Player %d's turn is over\n",i);
     }
-    compare_hands(players,playercount);
-    for(int i = 0; i < playercount+1;i++){
-        free(players[i]);
-    }
+
+    for (int i = 0; i < player_count; i++) free(players[i]);
 
     return 0;
 }
