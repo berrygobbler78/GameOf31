@@ -4,6 +4,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
+
 // default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
 const char HEARTS[] = "hearts", SPADES[] = "spades", DIAMONDS[] = "diamonds", CLUBS[] = "clubs";
@@ -75,11 +76,12 @@ void print_cards(card *cards, const int len) {
     printf("\n");
 
     for (int i = 0; i < len; i++) {
-        char icon[10];
-        if(strcmp(cards[i].suit,"hearts") != 0) strcpy(icon,"\u2665");
-        else if(strcmp(cards[i].suit,"clubs") != 0) strcpy(icon,"\u2663");
-        else if(strcmp(cards[i].suit,"spades") != 0) strcpy(icon,"\u2660");
-        else if(strcmp(cards[i].suit,"diamonds") != 0) strcpy(icon,"\u2666");
+        const char *icon;
+        if (strcmp(cards[i].suit, HEARTS) == 0) icon = "♥";
+        else if (strcmp(cards[i].suit, CLUBS) == 0) icon = "♣";
+        else if (strcmp(cards[i].suit, SPADES) == 0) icon = "♠";
+        else if (strcmp(cards[i].suit, DIAMONDS) == 0) icon = "♦";
+        else icon = "?";
 
         printf("│  %s  │ ", icon);
     }
