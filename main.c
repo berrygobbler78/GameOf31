@@ -4,7 +4,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <ctype.h>
-
+// default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
 #define NO_WIN -1
 #define HAS_14 0
@@ -95,50 +95,48 @@ void assign_suit(card *deck, const char *suit, const int index) {
     }
 }
 
-void print_cards(card *cards, const int deck_len) {
-    for(int i = 0; i < deck_len;i++){
+void print_cards(card *cards, const int len) {
+    for (int i = 0; i < len; i++) {
+        printf("%s ", TOP);
+    }
+
+    printf("\n");
+
+    for (int i = 0; i < len; i++) {
+        if (strcmp(cards[i].face,NONE) != 0) printf("|%c    │ ", toupper(cards[i].face[0]));
+        else if (cards[i].value == 10) printf("|%d   │ ", cards[i].value);
+        else printf("|%d    │ ", cards[i].value);
+    }
+
+    printf("\n");
+
+    for (int i = 0; i < len; i++) {
         char icon[10];
-        char msg[100];
-       
-        if(strcmp(cards[i].suit,"hearts") == 0) strcpy(icon,"\u2665");
-        if(strcmp(cards[i].suit,"clubs") == 0) strcpy(icon,"\u2663");
-        if(strcmp(cards[i].suit,"spades") == 0) strcpy(icon,"\u2660");
-        if(strcmp(cards[i].suit,"diamonds") == 0) strcpy(icon,"\u2666");
-        if(strcmp(cards[i].face,NONE) != 0){
-            printf("┌─────┐\n│%c    │\n│  %s  │\n│    %c│\n└─────┘\n",toupper(cards[i].face[0]),icon,toupper(cards[i].face[0]));
-        }else if(cards[i].value == 10){
-           printf("┌─────┐\n│%d   │\n│  %s  │\n│   %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
-        }else{
-           printf("┌─────┐\n│%d    │\n│  %s  │\n│    %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
+        if(strcmp(cards[i].suit,"hearts") != 0) strcpy(icon,"\u2665");
+        else if(strcmp(cards[i].suit,"clubs") != 0) strcpy(icon,"\u2663");
+        else if(strcmp(cards[i].suit,"spades") != 0) strcpy(icon,"\u2660");
+        else if(strcmp(cards[i].suit,"diamonds") != 0) strcpy(icon,"\u2666");
 
-        }
-        if (strcmp(cards[i].face, NONE) != 0) sprintf(msg, "%s of %s\n", cards[i].face, cards[i].suit);
-        else sprintf(msg, "%d of %s\n", cards[i].value, cards[i].suit);
-        slow_printf(msg);
+        printf("│  %s  │ ", icon);
     }
-}
-void print_dealer_cards(card *cards, const int deck_len){
-    char icon[10];
-    char msg[100];
-    printf("┌─────┐\n│     │\n│     │\n│     │\n└─────┘\n");
-    slow_printf("Face down card");
-    for(int i = 1;i < deck_len;i++){
-        if(strcmp(cards[i].suit,"hearts") == 0) strcpy(icon,"\u2665");
-        if(strcmp(cards[i].suit,"clubs") == 0) strcpy(icon,"\u2663");
-        if(strcmp(cards[i].suit,"spades") == 0) strcpy(icon,"\u2660");
-        if(strcmp(cards[i].suit,"diamonds") == 0) strcpy(icon,"\u2666");
-        if(strcmp(cards[i].face,NONE) != 0){
-            printf("┌─────┐\n│%c    │\n│  %s  │\n│    %c│\n└─────┘\n",toupper(cards[i].face[0]),icon,toupper(cards[i].face[0]));
-        }else if(cards[i].value == 10){
-           printf("┌─────┐\n│%d   │\n│  %s  │\n│   %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
-        }else{
-           printf("┌─────┐\n│%d    │\n│  %s  │\n│    %d│\n└─────┘\n",cards[i].value,icon,cards[i].value); 
 
-        }
-        if (strcmp(cards[i].face, NONE) != 0) sprintf(msg, "%s of %s\n", cards[i].face, cards[i].suit);
-        else sprintf(msg, "%d of %s\n", cards[i].value, cards[i].suit);
-        slow_printf(msg);
+    printf("\n");
+
+    for (int i = 0; i < len; i++) {
+        if (strcmp(cards[i].face,NONE) != 0) printf("|    %c│ ", toupper(cards[i].face[0]));
+        else if (cards[i].value == 10) printf("|   %d│ ", cards[i].value);
+        else printf("|    %d│ ", cards[i].value);
     }
+
+    printf("\n");
+
+    for (int i = 0; i < len; i++) {
+        printf("%s ", BOTTOM);
+    }
+
+    int total = 0;
+    for (int i = 0; i < len; i++) total += cards[i].value;
+    printf("\nTotal Value: %d\n", total);
 }
 
 void shuffle_deck(card *deck) {
