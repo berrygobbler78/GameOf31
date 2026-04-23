@@ -142,19 +142,40 @@ void print_cards(card *cards, const int len, int player) {
 void print_value(card *cards, int len) {
     printf("Total value: %d\n", hand_value(cards, len));
 }
+/* Help with this pls */
+void revealLastCard(card cards[]) {
+    const char *icon;
+    if (strcmp(cards[0].suit, HEARTS) == 0) icon = "♥";
+    else if (strcmp(cards[0].suit, CLUBS) == 0) icon = "♣";
+    else if (strcmp(cards[0].suit, SPADES) == 0) icon = "♠";
+    else if (strcmp(cards[0].suit, DIAMONDS) == 0) icon = "♦";
+    else icon = "?";
+    int hand = hand_value(&cards[0],0);
 
-void compare_cards(card players[], int playerlen[], int money[], int wager[], int playercount) {
+    printf("%s\n│%d    │\n│  %c  │\n│    %d│\n%s\nDealer's last card.\n",TOP,hand,*icon,hand,BOTTOM);
+}
+void compare_cards(card *players, int *playerlen, int money[], int wager[], int playercount, int win) {
+    if (win == 1) {
+        for (int i = 1; i < playercount; i++) {
+            money[i] += wager[i] * 2;
+        }
+        printf("All players win!");
+        return;
+    }
     int dealerval = hand_value(&players[0],playerlen[0]);
+
     if (dealerval == 14 || dealerval == 31) {
         printf("Dealer wins, dealer got %d\n",dealerval);
         return;
     }
+    revealLastCard(players);
     for (int i = 1;i < playercount;i++) {
-        if (hand_value(&players[i],playerlen[i]) > dealerval) {
-            printf("Player %d beats the dealer %d vs %d\n",i,hand_value(&players[i],playerlen[i]),dealerval);
+        const int hand = hand_value(&players[i],playerlen[i]);
+        if (hand > dealerval) {
+            printf("Player %d beats the dealer %d vs %d\n",i,hand,dealerval);
             money[i] += wager[i] * 2;
         }else {
-            printf("Player %d loses to the dealer %d vs %d \n", i,dealerval, hand_value(&players[i],playerlen[i]));
+            printf("Player %d loses to the dealer %d vs %d \n", i,dealerval, hand);
         }
     }
 }

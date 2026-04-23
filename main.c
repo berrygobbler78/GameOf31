@@ -69,12 +69,12 @@ int dealer_turn(card *deck, card **hand, int *hand_len) {
         }
         if (result == 31) {
             printf("Dealer hits 31!\n");
-            print_cards(*hand, *hand_len, 0);
+            print_cards(*hand, *hand_len, -1);
             return HAS_31;
         }
         if (result == 14) {
             printf("Dealer hits 14, must stop.\n");
-            print_cards(*hand, *hand_len, 0);  // Reveal all
+            print_cards(*hand, *hand_len, -1);  // Reveal all
             return HAS_14;
         }
 
@@ -119,9 +119,8 @@ void run(int *total_money, card *players[], int player_count) {
         do {
             printf("How much to wager? Total money: %d\n", total_money[i]);
             scanf("%d", &wagers[i]);
-        } while (total_money[i] - wagers[i] <= 0);
+        } while (wagers[i] > total_money[i]);
     }
-
     int win = NO_WIN;
     if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
 
@@ -145,7 +144,7 @@ void run(int *total_money, card *players[], int player_count) {
         }
         printf("Player %d's turn is over\n",i);
     }
-    compare_cards(*players, player_len, total_money, wagers, player_count);
+    compare_cards(*players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
 
