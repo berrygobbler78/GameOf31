@@ -150,32 +150,43 @@ void revealLastCard(card cards[]) {
     else if (strcmp(cards[0].suit, SPADES) == 0) icon = "♠";
     else if (strcmp(cards[0].suit, DIAMONDS) == 0) icon = "♦";
     else icon = "?";
-    int hand = hand_value(&cards[0],0);
-
-    printf("%s\n│%d    │\n│  %c  │\n│    %d│\n%s\nDealer's last card.\n",TOP,hand,*icon,hand,BOTTOM);
+    int hand = cards[0].value;
+    if (hand == 10) {
+        printf("%s\n│%d   │\n│  %s  │\n│   %d│\n%s\nDealer's last card.\n",TOP,hand,icon,hand,BOTTOM);
+        return;
+    }
+    if (hand == 11) {
+        printf("%s\n│%c    │\n│  %s  │\n│    %c│\n%s\nDealer's last card.\n",TOP,'A',icon,'A',BOTTOM);
+        return;
+    }
+    printf("%s\n│%d    │\n│  %s  │\n│    %d│\n%s\nDealer's last card.\n",TOP,hand,icon,hand,BOTTOM);
 }
-void compare_cards(card *players, int *playerlen, int money[], int wager[], int playercount, int win) {
+void compare_cards(card *players[], int playerlen[], int money[], int wager[], int playercount, int win) {
     if (win == 1) {
         for (int i = 1; i < playercount; i++) {
             money[i] += wager[i] * 2;
         }
-        printf("All players win!");
+        printf("All players win!\n");
         return;
     }
-    int dealerval = hand_value(&players[0],playerlen[0]);
+    int dealerval = hand_value(players[0],playerlen[0]);
 
-    if (dealerval == 14 || dealerval == 31) {
-        printf("Dealer wins, dealer got %d\n",dealerval);
+    if (dealerval == 31) {
+        printf("Dealer wins, dealer got 31!\n");
         return;
     }
-    revealLastCard(players);
+    if (dealerval != 14) revealLastCard(players[0]);
+
     for (int i = 1;i < playercount;i++) {
-        const int hand = hand_value(&players[i],playerlen[i]);
-        if (hand > dealerval) {
-            printf("Player %d beats the dealer %d vs %d\n",i,hand,dealerval);
+        const int hand = hand_value(players[i],playerlen[i]);
+        if ((hand == 14 || hand == 31) && dealerval != 14) {
+            printf("Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n",i,hand,i);
+            money[i] += wager[i] * 2;
+        }else if (hand < 32 && hand > dealerval) {
+            printf("Dealer beats Player %d  %d vs %d!\n",i,hand,dealerval);
             money[i] += wager[i] * 2;
         }else {
-            printf("Player %d loses to the dealer %d vs %d \n", i,dealerval, hand);
+            printf("Player %d loses to the dealer %d vs %d!\n", i,dealerval, hand);
         }
     }
 }

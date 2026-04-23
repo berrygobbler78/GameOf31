@@ -151,7 +151,7 @@ void run(int *total_money, card *players[], int player_count) {
     compare_cards(players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-//BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERES SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
+////BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERES SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
 int main(void) {
     SetConsoleOutputCP(65001);  // UTF-8
     SetConsoleCP(65001); //AI-Generated, icons work on Linux but not windows
