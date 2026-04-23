@@ -119,7 +119,7 @@ void run(int *total_money, card *players[], int player_count) {
         do {
             printf("How much to wager? Total money: %d\n", total_money[i]);
             scanf("%d", &wagers[i]);
-        } while (total_money[i] - wagers[i] > 0);
+        } while (total_money[i] - wagers[i] <= 0);
     }
 
     int win = NO_WIN;
@@ -135,6 +135,7 @@ void run(int *total_money, card *players[], int player_count) {
             win = check_hand(players[i], player_len[i]);
 
             print_cards(players[i], player_len[i], i);
+            printf("Total Value: %d\n", hand_value(players[i], player_len[i]));
 
             if (win != -1) break;
 
@@ -172,7 +173,7 @@ int main(void) {
         run(total_money, players, player_count);
         do {
             printf("Would you like to play again? (y/n) ");
-            scanf("%c", &play);
+            scanf(" %c", &play);
         } while (play != 'y' && play != 'n');
     }
     printf("Goodbye...");

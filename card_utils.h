@@ -72,6 +72,7 @@ int hand_value(card *hand, int len){
 }
 
 void print_cards(card *cards, const int len, int player) {
+    printf("\n");
     for (int i = 0; i < len; i++) {
         printf("%s ", TOP);
     }
@@ -145,15 +146,15 @@ void print_value(card *cards, int len) {
 void compare_cards(card players[], int playerlen[], int money[], int wager[], int playercount) {
     int dealerval = hand_value(&players[0],playerlen[0]);
     if (dealerval == 14 || dealerval == 31) {
-        printf("Dealer win's, dealer got %d",dealerval);
+        printf("Dealer wins, dealer got %d\n",dealerval);
         return;
     }
     for (int i = 1;i < playercount;i++) {
         if (hand_value(&players[i],playerlen[i]) > dealerval) {
-            printf("Player %d beats the dealer %d vs %d",i,hand_value(&players[i],playerlen[i]),dealerval);
+            printf("Player %d beats the dealer %d vs %d\n",i,hand_value(&players[i],playerlen[i]),dealerval);
             money[i] += wager[i] * 2;
         }else {
-            printf("Player %d loses to the dealer",i);
+            printf("Player %d loses to the dealer %d vs %d \n", i,dealerval, hand_value(&players[i],playerlen[i]));
         }
     }
 }
