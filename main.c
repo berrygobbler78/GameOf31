@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
 #include <ctype.h>
 #include "card_utils.h"
 #include <windows.h>
@@ -58,38 +57,38 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
 }
 
 int dealer_turn(card *deck, card **hand, int *hand_len) {
-    printf("Dealer's turn... | ");
+    fast_printf("Dealer's turn... | ");
 
     while (1) {
         draw(deck, hand, hand_len,1);
         int result = hand_value(*hand,*hand_len);
 
         if (result > 31) {
-            printf("Dealer busts! All players win!\n");
+            fast_printf("Dealer busts! All players win!\n");
             print_cards(*hand, *hand_len, -1);
             return OVER_31;
         }
         if (result == 31) {
-            printf("Dealer hits 31!\n");
+            fast_printf("Dealer hits 31!\n");
             print_cards(*hand, *hand_len, -1);
             return HAS_31;
         }
         if (result == 14) {
-            printf("Dealer hits 14, must stop.\n");
+            fast_printf("Dealer hits 14, must stop.\n");
             print_cards(*hand, *hand_len, -1);  // Reveal all
             return HAS_14;
         }
 
         // Dealer's strategy: stop at 26+
         if (hand_value(*hand, *hand_len) >= 26) {
-            printf("Dealer stands.\n");
+            fast_printf("Dealer stands.\n");
             print_cards(*hand, *hand_len, 0);
             return NO_WIN;
         }
     }
 }
 
-int check_hand(card *hand, int hand_len) {
+int check_hand(const card *hand, int hand_len) {
     int total = 0;
     for (int i = 0; i < hand_len; i++) total += hand[i].value;
 
@@ -119,39 +118,63 @@ void run(int *total_money, card *players[], int player_count) {
     for (int i = 1; i < player_count; i++) {
         print_cards(players[i], player_len[i], i);
         do {
-            printf("How much to wager? Total money:");
+            if (total_money[i] == 0) {
+                fast_printf("Looks like you're broke! Here's 1 dollar to keep going!\n");
+                total_money[i] += 1;
+            }
+            fast_printf("How much to wager? Total money:");
             printf( "%d\n", total_money[i]);
             scanf("%d", &wagers[i]);
         } while (wagers[i] > total_money[i]);
+        total_money[i] -= wagers[i];
     }
     int win = NO_WIN;
     if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
-    int playerBreak = -1;
+    int playerBreak;
     for (int i = 1; i < player_count; i++){
         if (win != -1) break;
-
-        printf("Player %d's turn:\n",i);
+        printf("--------------------\n");
+        fast_printf("Player ");
+        printf("%d's",i);
+        fast_printf(" turn\n");
         while (1) {
             draw(deck, &players[i], &player_len[i],0);
 
             playerBreak = check_hand(players[i], player_len[i]);
 
             print_cards(players[i], player_len[i], i);
-            printf("Total Value: %d\n", hand_value(players[i], player_len[i]));
+            fast_printf("Total Value: ");
+            printf("%d\n", hand_value(players[i], player_len[i]));
 
             if (playerBreak != -1) break;
 
             int temp;
-            printf("Continue? (1 for yes, 0 for no)\n");
+            fast_printf("Continue? (1 for yes, 0 for no)\n");
             if (scanf("%d", &temp) == 0 || temp == 0) break;
         }
-        playerBreak = -1;
-        printf("Player %d's turn is over\n",i);
+        char buffer[50];
+        switch (playerBreak) {
+            case OVER_31:
+                snprintf(buffer,sizeof(buffer),"Player %d busts",i);
+                fast_printf(buffer);
+                break;
+            case HAS_14:
+                snprintf(buffer,sizeof(buffer),"Player %d hit 14",i);
+                fast_printf(buffer);
+                break;
+            case HAS_31:
+                snprintf(buffer,sizeof(buffer),"Player %d hit 31",i);
+                fast_printf(buffer);
+                break;
+        }
+        fast_printf("\nPlayer ");
+        printf("%d's",i);
+        fast_printf(" turn is over\n");
     }
     compare_cards(players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-////BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERES SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
+////BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERE'S SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
 int main(void) {
     SetConsoleOutputCP(65001);  // UTF-8
     SetConsoleCP(65001); //AI-Generated, icons work on Linux but not windows
@@ -161,7 +184,7 @@ int main(void) {
     // player setup
     int player_count = 0;
     do {
-        printf("Enter number of players:\n");
+        fast_printf("Enter number of players:\n");
         scanf("%d", &player_count);
     } while (player_count < 1);
 
@@ -178,7 +201,7 @@ int main(void) {
     while (play == 'y') {
         run(total_money, players, player_count);
         do {
-            printf("Would you like to play again? (y/n) ");
+            fast_printf("Would you like to play again? (y/n) ");
             scanf(" %c", &play);
         } while (play != 'y' && play != 'n');
     }

@@ -17,6 +17,30 @@ typedef struct card_s {
     int value;
 } card;
 
+void delay(int milliseconds)
+{
+    clock_t then;
+
+    long pause = milliseconds * (CLOCKS_PER_SEC / 1000);
+    clock_t now = then = clock();
+    while( (now-then) < pause ) now = clock();
+}
+
+void fast_printf(const char *message) {
+    for (int i = 0; i < strlen(message); i++) {
+        putchar(message[i]);
+        if (message[i] != '\n') {
+            //putchar('|'); // To mimic a cursor
+            fflush(stdout); // Ensures char is printed immediately
+            delay(50 + rand() % 51); // Delay between two vals
+            //putchar('\b'); // 'backspace' removes '|'
+            fflush(stdout);
+        } else {
+            fflush(stdout);
+            delay(100 + rand() % 201);
+        }
+    }
+}
 void assign_suit(card *deck, const char *suit, const int index) {
     int king = 0, queen = 0, jack = 0;
 
@@ -63,7 +87,7 @@ void init(card deck[]){
     shuffle_deck(deck);
 }
 
-int hand_value(card *hand, int len){
+int hand_value(const card *hand, int len){
     int sum = 0;
     for(int i = 0 ;i < len;i++){
         sum += hand[i].value;
@@ -71,7 +95,7 @@ int hand_value(card *hand, int len){
     return sum;
 }
 
-void print_cards(card *cards, const int len, int player) {
+void print_cards(const card *cards, const int len, int player) {
     printf("\n");
     for (int i = 0; i < len; i++) {
         printf("%s ", TOP);
@@ -132,17 +156,18 @@ void print_cards(card *cards, const int len, int player) {
     printf("\n");
 
     if (player < 1) {
-        printf("Dealer's card(s)\n");
+        fast_printf("Dealer's card(s)\n");
         return;
     }
-
-    printf("Player %d's card(s)\n", player);
+    fast_printf("Player ");
+    printf("%d's",player);
+    fast_printf(" cards(s)\n");
 }
 
-void print_value(card *cards, int len) {
+/*void print_value(card *cards, int len) {
     printf("Total value: %d\n", hand_value(cards, len));
-}
-/* Help with this pls don't know why its not working*/
+}*/
+/* Help with this pls don't know why it's not working*/
 void revealLastCard(card cards[]) {
     const char *icon;
     if (strcmp(cards[0].suit, HEARTS) == 0) icon = "♥";
@@ -152,41 +177,48 @@ void revealLastCard(card cards[]) {
     else icon = "?";
     int hand = cards[0].value;
     if (hand == 10) {
-        printf("%s\n│%d   │\n│  %s  │\n│   %d│\n%s\nDealer's last card.\n",TOP,hand,icon,hand,BOTTOM);
+        printf("%s\n│%d   │\n│  %s  │\n│   %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
+        fast_printf("Dealer's last card.\n");
         return;
     }
     if (hand == 11) {
-        printf("%s\n│%c    │\n│  %s  │\n│    %c│\n%s\nDealer's last card.\n",TOP,'A',icon,'A',BOTTOM);
+        printf("%s\n│%c    │\n│  %s  │\n│    %c│\n%s\n",TOP,'A',icon,'A',BOTTOM);
+        fast_printf("Dealer's last card.\n");
         return;
     }
-    printf("%s\n│%d    │\n│  %s  │\n│    %d│\n%s\nDealer's last card.\n",TOP,hand,icon,hand,BOTTOM);
+    printf("%s\n│%d    │\n│  %s  │\n│    %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
+    fast_printf("Dealer's last card.\n");
 }
-void compare_cards(card *players[], int playerlen[], int money[], int wager[], int playercount, int win) {
+void compare_cards(card *players[], int playerLen[], int money[], int wager[], int playerCount, int win) {
     if (win == 1) {
-        for (int i = 1; i < playercount; i++) {
+        for (int i = 1; i < playerCount; i++) {
             money[i] += wager[i] * 2;
         }
-        printf("All players win!\n");
+        fast_printf("All players win!\n");
         return;
     }
-    int dealerval = hand_value(players[0],playerlen[0]);
+    int dealerVal = hand_value(players[0],playerLen[0]);
 
-    if (dealerval == 31) {
-        printf("Dealer wins, dealer got 31!\n");
+    if (dealerVal == 31) {
+        fast_printf("Dealer wins, dealer got 31!\n");
         return;
     }
-    if (dealerval != 14) revealLastCard(players[0]);
+    if (dealerVal != 14) revealLastCard(players[0]);
 
-    for (int i = 1;i < playercount;i++) {
-        const int hand = hand_value(players[i],playerlen[i]);
-        if ((hand == 14 || hand == 31) && dealerval != 14) {
-            printf("Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n",i,hand,i);
+    for (int i = 1;i < playerCount;i++) {
+        char buffer[100];
+        const int hand = hand_value(players[i],playerLen[i]);
+        if ((hand == 14 || hand == 31) && dealerVal != 14) {
+            snprintf(buffer,sizeof(buffer),"Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n",i,hand,i);
+            fast_printf(buffer);
             money[i] += wager[i] * 2;
-        }else if (hand < 32 && hand > dealerval) {
-            printf("Dealer beats Player %d  %d vs %d!\n",i,hand,dealerval);
+        }else if (hand < 32 && hand > dealerVal) {
+            snprintf(buffer,sizeof(buffer),"Dealer beats Player %d  %d vs %d!\n",i,hand,dealerVal);
+            fast_printf(buffer);
             money[i] += wager[i] * 2;
         }else {
-            printf("Player %d loses to the dealer %d vs %d!\n", i,dealerval, hand);
+            snprintf(buffer,sizeof(buffer),"Player %d loses to the dealer %d vs %d!\n", i,dealerVal, hand);
+            fast_printf(buffer);
         }
     }
 }
