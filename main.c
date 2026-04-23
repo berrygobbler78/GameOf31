@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include "card_utils.h"
+#include <windows.h>
 
 int end_game = -1;
 
@@ -41,6 +42,7 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
         else {
             int input;
             do {
+                //REDO PLAYER DOES NOT GET TO CHOOSE EVEN ACE, ONLY THE FIRST ONE
                 printf("Enter value for ACE (1 or 11)\n");
                 scanf("%d", &input);
             } while (input != 1 && input != 11);
@@ -117,13 +119,14 @@ void run(int *total_money, card *players[], int player_count) {
     for (int i = 1; i < player_count; i++) {
         print_cards(players[i], player_len[i], i);
         do {
-            printf("How much to wager? Total money: %d\n", total_money[i]);
+            printf("How much to wager? Total money:");
+            printf( "%d\n", total_money[i]);
             scanf("%d", &wagers[i]);
         } while (wagers[i] > total_money[i]);
     }
     int win = NO_WIN;
     if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
-
+    int playerBreak = -1;
     for (int i = 1; i < player_count; i++){
         if (win != -1) break;
 
@@ -131,24 +134,28 @@ void run(int *total_money, card *players[], int player_count) {
         while (1) {
             draw(deck, &players[i], &player_len[i],0);
 
-            win = check_hand(players[i], player_len[i]);
+            playerBreak = check_hand(players[i], player_len[i]);
 
             print_cards(players[i], player_len[i], i);
             printf("Total Value: %d\n", hand_value(players[i], player_len[i]));
 
-            if (win != -1) break;
+            if (playerBreak != -1) break;
 
             int temp;
             printf("Continue? (1 for yes, 0 for no)\n");
             if (scanf("%d", &temp) == 0 || temp == 0) break;
         }
+        playerBreak = -1;
         printf("Player %d's turn is over\n",i);
     }
-    compare_cards(*players, player_len, total_money, wagers, player_count,win);
+    compare_cards(players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-//
+//BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERES SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
 int main(void) {
+    SetConsoleOutputCP(65001);  // UTF-8
+    SetConsoleCP(65001); //AI-Generated, icons work on Linux but not windows
+
     srand(time(0));
 
     // player setup
