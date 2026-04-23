@@ -147,7 +147,7 @@ void run(int *total_money, card *players[], int player_count) {
     compare_cards(*players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-
+//
 int main(void) {
     srand(time(0));
 

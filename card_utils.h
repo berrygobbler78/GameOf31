@@ -142,7 +142,7 @@ void print_cards(card *cards, const int len, int player) {
 void print_value(card *cards, int len) {
     printf("Total value: %d\n", hand_value(cards, len));
 }
-/* Help with this pls */
+/* Help with this pls don't know why its not working*/
 void revealLastCard(card cards[]) {
     const char *icon;
     if (strcmp(cards[0].suit, HEARTS) == 0) icon = "♥";
