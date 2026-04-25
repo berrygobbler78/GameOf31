@@ -18,7 +18,7 @@ int end_game = -1;
 
 #define DRAWN (-1)
 
-void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_chosen) {
+void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_count,int *ace_last_val) {
     if (*hand_len >= 52) {
         printf("No more cards in the deck.\n");
         return;
@@ -40,18 +40,18 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_chosen
             int current = hand_value(*hand, *hand_len);
             temp.value = (current + 11 <= 31) ? 11 : 1;
         }
-        else  if (!*ace_chosen) {
-            // first ace, player chooses
+        else if (*ace_count % 2 == 0) {
             int input;
             do {
-                fast_printf("Enter value for ACE (1 or 11)\n");
+                fast_printf("Enter value for ACE (1 or 11): ");
                 scanf("%d", &input);
             } while (input != 1 && input != 11);
             temp.value = input;
-            *ace_chosen = input;  // remember what player picked picked
+            *ace_last_val = input;
+            (*ace_count)++;
         } else {
-            // second ace, opposite of first
-            temp.value = (*ace_chosen == 11) ? 1 : 11;
+            temp.value = (*ace_last_val == 11) ? 1 : 11;
+            (*ace_count)++;
         }
 
     }
@@ -61,10 +61,10 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_chosen
     *hand_len += 1;
 }
 
-int dealer_turn(card *deck, card **hand, int *hand_len, int *ace_chosen) {
+int dealer_turn(card *deck, card **hand, int *hand_len) {
     fast_printf("Dealer's turn... | ");
     while (1) {
-        draw(deck, hand, hand_len,1,ace_chosen);
+        draw(deck, hand, hand_len,1,0,0);
         int result = hand_value(*hand,*hand_len);
 
         if (result > 31) {
@@ -108,21 +108,22 @@ void run(int *total_money, card *players[], int player_count) {
     card deck[52];
     init(deck);
 
-    int player_len[player_count];
-    int wagers[player_count];
-    int ace_chosen[player_count];
+    int player_len[player_count], wagers[player_count], ace_count[player_count], ace_last_val[player_count];
     players[0] = NULL;
     player_len[0] = 0;
 
-    for (int i = 0; i < player_count; i++) ace_chosen[i] = 0;
+    for (int i = 0; i < player_count; i++) {
+        ace_count[i] = 0;
+        ace_last_val[i] = 0;
+    }
 
-    draw(deck, &players[0], &player_len[0],1,&ace_chosen[0]);
+    draw(deck, &players[0], &player_len[0],1,0,0);
     print_cards(players[0], player_len[0], 0);
 
     for (int i = 1; i < player_count; i++) {
         players[i] = NULL;
         player_len[i] = 0;
-        draw(deck, &players[i], &player_len[i],0,&ace_chosen[i]);
+        draw(deck, &players[i], &player_len[i],0,&ace_count[i],&ace_last_val[i]);
 
     }
 
@@ -141,7 +142,7 @@ void run(int *total_money, card *players[], int player_count) {
         total_money[i] -= wagers[i];
     }
     int win = NO_WIN;
-    if (dealer_turn(deck,&players[0],&player_len[0],&ace_chosen[0]) == OVER_31) win = 1;
+    if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
     int playerBreak;
     for (int i = 1; i < player_count; i++){
         if (win != -1) break;
@@ -150,7 +151,7 @@ void run(int *total_money, card *players[], int player_count) {
         printf("%d's",i);
         fast_printf(" turn\n");
         while (1) {
-            draw(deck, &players[i], &player_len[i],0,&ace_chosen[i]);
+            draw(deck, &players[i], &player_len[i],0,&ace_count[i],&ace_last_val[i]);
 
             playerBreak = check_hand(players[i], player_len[i]);
 
