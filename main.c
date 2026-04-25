@@ -4,7 +4,9 @@
 #include <time.h>
 #include <ctype.h>
 #include "card_utils.h"
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
 int end_game = -1;
 
@@ -42,7 +44,8 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer) {
             int input;
             do {
                 //REDO PLAYER DOES NOT GET TO CHOOSE EVEN ACE, ONLY THE FIRST ONE
-                printf("Enter value for ACE (1 or 11)\n");
+
+                fast_printf("Enter value for ACE (1 or 11)\n");
                 scanf("%d", &input);
             } while (input != 1 && input != 11);
 
@@ -106,14 +109,18 @@ void run(int *total_money, card *players[], int player_count) {
 
     int player_len[player_count];
     int wagers[player_count];
+    players[0] = NULL;
+    player_len[0] = 0;
+    draw(deck, &players[0], &player_len[0],1);
+    print_cards(players[0], player_len[0], 0);
 
-    for (int i = 0; i < player_count; i++) {
+    for (int i = 1; i < player_count; i++) {
         players[i] = NULL;
         player_len[i] = 0;
         draw(deck, &players[i], &player_len[i],0);
+
     }
 
-    print_cards(players[0], player_len[0], 0);
 
     for (int i = 1; i < player_count; i++) {
         print_cards(players[i], player_len[i], i);
@@ -166,6 +173,7 @@ void run(int *total_money, card *players[], int player_count) {
                 snprintf(buffer,sizeof(buffer),"Player %d hit 31",i);
                 fast_printf(buffer);
                 break;
+            default: ;
         }
         fast_printf("\nPlayer ");
         printf("%d's",i);
@@ -176,8 +184,10 @@ void run(int *total_money, card *players[], int player_count) {
 }
 ////BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERE'S SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
 int main(void) {
+    #ifdef _WIN32
     SetConsoleOutputCP(65001);  // UTF-8
     SetConsoleCP(65001); //AI-Generated, icons work on Linux but not windows
+    #endif
 
     srand(time(0));
 

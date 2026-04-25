@@ -30,10 +30,8 @@ void fast_printf(const char *message) {
     for (int i = 0; i < strlen(message); i++) {
         putchar(message[i]);
         if (message[i] != '\n') {
-            //putchar('|'); // To mimic a cursor
-            fflush(stdout); // Ensures char is printed immediately
-            delay(50 + rand() % 51); // Delay between two vals
-            //putchar('\b'); // 'backspace' removes '|'
+            fflush(stdout);
+            delay(30 + rand() % 31);
             fflush(stdout);
         } else {
             fflush(stdout);
