@@ -4,6 +4,11 @@
 
 #ifndef GAMEOF31_CARD_UTILS_H
 #define GAMEOF31_CARD_UTILS_H
+#define RED     "\033[31m"
+#define BLACK   "\033[90m"
+#define GOLD   "\033[33m"
+#define RESET   "\033[0m"
+
 
 // default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
@@ -121,10 +126,10 @@ void print_cards(const card *cards, const int len, int player) {
         }
 
         const char *icon;
-        if (strcmp(cards[i].suit, HEARTS) == 0) icon = "♥";
-        else if (strcmp(cards[i].suit, CLUBS) == 0) icon = "♣";
-        else if (strcmp(cards[i].suit, SPADES) == 0) icon = "♠";
-        else if (strcmp(cards[i].suit, DIAMONDS) == 0) icon = "♦";
+        if (strcmp(cards[i].suit, HEARTS) == 0) icon = RED "♥" RESET;
+        else if (strcmp(cards[i].suit, CLUBS) == 0) icon = BLACK "♣" RESET;
+        else if (strcmp(cards[i].suit, SPADES) == 0) icon = BLACK "♠" RESET;
+        else if (strcmp(cards[i].suit, DIAMONDS) == 0) icon = RED "♦" RESET;
         else icon = "?";
 
         printf("│  %s  │ ", icon);
@@ -168,10 +173,10 @@ void print_cards(const card *cards, const int len, int player) {
 /* Help with this pls don't know why it's not working*/
 void revealLastCard(card cards[]) {
     const char *icon;
-    if (strcmp(cards[0].suit, HEARTS) == 0) icon = "♥";
+    if (strcmp(cards[0].suit, HEARTS) == 0) icon = RED "♥" RESET;
     else if (strcmp(cards[0].suit, CLUBS) == 0) icon = "♣";
     else if (strcmp(cards[0].suit, SPADES) == 0) icon = "♠";
-    else if (strcmp(cards[0].suit, DIAMONDS) == 0) icon = "♦";
+    else if (strcmp(cards[0].suit, DIAMONDS) == 0) icon = RED "♦" RESET;
     else icon = "?";
     int hand = cards[0].value;
     if (hand == 10) {
@@ -207,15 +212,15 @@ void compare_cards(card *players[], int playerLen[], int money[], int wager[], i
         char buffer[100];
         const int hand = hand_value(players[i],playerLen[i]);
         if ((hand == 14 || hand == 31) && dealerVal != 14) {
-            snprintf(buffer,sizeof(buffer),"Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n",i,hand,i);
+            snprintf(buffer,sizeof(buffer), GOLD "Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n" RESET,i,hand,i);
             fast_printf(buffer);
             money[i] += wager[i] * 2;
         }else if (hand < 32 && hand > dealerVal) {
-            snprintf(buffer,sizeof(buffer),"Dealer beats Player %d  %d vs %d!\n",i,hand,dealerVal);
+            snprintf(buffer,sizeof(buffer),GOLD "Player %d beats the dealer %d vs %d!\n" RESET,i,hand,dealerVal);
             fast_printf(buffer);
             money[i] += wager[i] * 2;
         }else {
-            snprintf(buffer,sizeof(buffer),"Player %d loses to the dealer %d vs %d!\n", i,dealerVal, hand);
+            snprintf(buffer,sizeof(buffer),RED "Player %d loses to the dealer %d vs %d!\n" RESET, i,dealerVal, hand);
             fast_printf(buffer);
         }
     }

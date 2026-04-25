@@ -15,10 +15,16 @@ int end_game = -1;
 #define HAS_14 0
 #define HAS_31 1
 #define OVER_31 2
+#define RED     "\033[31m"
+#define BLACK   "\033[90m"
+#define GREEN  "\033[32m"
+#define GOLD   "\033[33m"
+#define RESET   "\033[0m"
+
 
 #define DRAWN (-1)
 
-void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_count,int *ace_last_val) {
+void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,int *ace_last_val) {
     if (*hand_len >= 52) {
         printf("No more cards in the deck.\n");
         return;
@@ -36,14 +42,16 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_count,
 
     if (strcmp(temp.face, ACE) == 0) {
         // TODO: Add better interface for picking Ace val
-        if (is_dealer) {
+        if (playerNum == 0) {
             int current = hand_value(*hand, *hand_len);
             temp.value = (current + 11 <= 31) ? 11 : 1;
         }
         else if (*ace_count % 2 == 0) {
             int input;
+            char buffer[100];
             do {
-                fast_printf("Enter value for ACE (1 or 11): ");
+                snprintf(buffer,sizeof(buffer),GOLD "Player %d pulled an ACE! Enter value for ACE (1 or 11): " RESET,playerNum);
+                fast_printf(buffer);
                 scanf("%d", &input);
             } while (input != 1 && input != 11);
             temp.value = input;
@@ -64,11 +72,11 @@ void draw(card *deck, card **hand, int *hand_len, int is_dealer, int *ace_count,
 int dealer_turn(card *deck, card **hand, int *hand_len) {
     fast_printf("Dealer's turn... | ");
     while (1) {
-        draw(deck, hand, hand_len,1,0,0);
+        draw(deck, hand, hand_len,0,0,0);
         int result = hand_value(*hand,*hand_len);
 
         if (result > 31) {
-            fast_printf("Dealer busts! All players win!\n");
+            fast_printf(GOLD "Dealer busts! All players win!\n" RESET);
             print_cards(*hand, *hand_len, -1);
             return OVER_31;
         }
@@ -117,18 +125,18 @@ void run(int *total_money, card *players[], int player_count) {
         ace_last_val[i] = 0;
     }
 
-    draw(deck, &players[0], &player_len[0],1,0,0);
+    draw(deck, &players[0], &player_len[0],0,0,0);
     print_cards(players[0], player_len[0], 0);
 
     for (int i = 1; i < player_count; i++) {
-        players[i] = NULL;
-        player_len[i] = 0;
-        draw(deck, &players[i], &player_len[i],0,&ace_count[i],&ace_last_val[i]);
 
     }
 
 
     for (int i = 1; i < player_count; i++) {
+        players[i] = NULL;
+        player_len[i] = 0;
+        draw(deck, &players[i], &player_len[i],i,&ace_count[i],&ace_last_val[i]);
         print_cards(players[i], player_len[i], i);
         do {
             if (total_money[i] == 0) {
@@ -144,20 +152,20 @@ void run(int *total_money, card *players[], int player_count) {
     int win = NO_WIN;
     if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
     int playerBreak;
+    char buffer[50];
     for (int i = 1; i < player_count; i++){
         if (win != -1) break;
         printf("--------------------\n");
-        fast_printf("Player ");
-        printf("%d's",i);
-        fast_printf(" turn\n");
+        snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn!\n" RESET,i);
+        fast_printf(buffer);
         while (1) {
-            draw(deck, &players[i], &player_len[i],0,&ace_count[i],&ace_last_val[i]);
+            draw(deck, &players[i], &player_len[i],i,&ace_count[i],&ace_last_val[i]);
 
             playerBreak = check_hand(players[i], player_len[i]);
 
             print_cards(players[i], player_len[i], i);
-            fast_printf("Total Value: ");
-            printf("%d\n", hand_value(players[i], player_len[i]));
+            fast_printf( GREEN "Total Value: " RESET);
+            printf(GREEN "%d\n" RESET, hand_value(players[i], player_len[i]));
 
             if (playerBreak != -1) break;
 
@@ -165,30 +173,29 @@ void run(int *total_money, card *players[], int player_count) {
             fast_printf("Continue? (1 for yes, 0 for no)\n");
             if (scanf("%d", &temp) == 0 || temp == 0) break;
         }
-        char buffer[50];
+
         switch (playerBreak) {
             case OVER_31:
-                snprintf(buffer,sizeof(buffer),"Player %d busts",i);
+                snprintf(buffer,sizeof(buffer),RED "Player %d busts" RESET,i);
                 fast_printf(buffer);
                 break;
             case HAS_14:
-                snprintf(buffer,sizeof(buffer),"Player %d hit 14",i);
+                snprintf(buffer,sizeof(buffer),GOLD "Player %d hit 14" RESET,i);
                 fast_printf(buffer);
                 break;
             case HAS_31:
-                snprintf(buffer,sizeof(buffer),"Player %d hit 31",i);
+                snprintf(buffer,sizeof(buffer),GOLD "Player %d hit 31" RESET,i);
                 fast_printf(buffer);
                 break;
             default: ;
         }
-        fast_printf("\nPlayer ");
-        printf("%d's",i);
-        fast_printf(" turn is over\n");
+        snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
+        fast_printf(buffer);
     }
     compare_cards(players, player_len, total_money, wagers, player_count,win);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-////BUG FIXES: STILL ASKS FOR DEALER'S FIRST ACE VALUE WHEN IT SHOULDN'T, THERE'S SOME BUGS WITH ACES WITH HIGH NUMBERS OF PLAYERS
+
 int main(void) {
     #ifdef _WIN32
     SetConsoleOutputCP(65001);  // UTF-8
@@ -199,6 +206,7 @@ int main(void) {
 
     // player setup
     int player_count = 0;
+    fast_printf("Welcome to " BLACK "GAME " RED "OF " BLACK "3" RED "1\n" RESET);
     do {
         fast_printf("Enter number of players:\n");
         scanf("%d", &player_count);
@@ -221,7 +229,8 @@ int main(void) {
             scanf(" %c", &play);
         } while (play != 'y' && play != 'n');
     }
-    printf("Goodbye...");
+    fast_printf("Goodbye...");
+    delay(1000);
 
     return 0;
 }
