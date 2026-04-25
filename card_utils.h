@@ -1,9 +1,12 @@
 //
 // Created by wgaris on 4/20/26.
 //
+#pragma once
+#include <ctype.h>
 
 #ifndef GAMEOF31_CARD_UTILS_H
 #define GAMEOF31_CARD_UTILS_H
+// colors
 #define RED     "\033[31m"
 #define BLACK   "\033[90m"
 #define GOLD   "\033[33m"
@@ -40,10 +43,11 @@ void fast_printf(const char *message) {
             fflush(stdout);
         } else {
             fflush(stdout);
-            delay(100 + rand() % 201);
+            delay(30 + rand() % 31);
         }
     }
 }
+
 void assign_suit(card *deck, const char *suit, const int index) {
     int king = 0, queen = 0, jack = 0;
 
@@ -171,7 +175,7 @@ void print_cards(const card *cards, const int len, int player) {
     printf("Total value: %d\n", hand_value(cards, len));
 }*/
 /* Help with this pls don't know why it's not working*/
-void revealLastCard(card cards[]) {
+void revealLastCard(card cards[], int dealerVal) {
     const char *icon;
     if (strcmp(cards[0].suit, HEARTS) == 0) icon = RED "♥" RESET;
     else if (strcmp(cards[0].suit, CLUBS) == 0) icon = "♣";
@@ -190,8 +194,15 @@ void revealLastCard(card cards[]) {
         return;
     }
     printf("%s\n│%d    │\n│  %s  │\n│    %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
-    fast_printf("Dealer's last card.\n");
+    fast_printf("Dealer's last card.\n" RED "Dealer's total Value: ");
+    printf("%d\n" RESET,dealerVal);
+
 }
+/*
+ * Still kind of confused who should win if dealer hits 14 or 31
+ * Also if the player has 31 and so does the dealer who wins?
+ * I feel like there should be a push option
+ */
 void compare_cards(card *players[], int playerLen[], int money[], int wager[], int playerCount, int win) {
     if (win == 1) {
         for (int i = 1; i < playerCount; i++) {
@@ -206,7 +217,7 @@ void compare_cards(card *players[], int playerLen[], int money[], int wager[], i
         fast_printf("Dealer wins, dealer got 31!\n");
         return;
     }
-    if (dealerVal != 14) revealLastCard(players[0]);
+    if (dealerVal != 14) revealLastCard(players[0],dealerVal);
 
     for (int i = 1;i < playerCount;i++) {
         char buffer[100];

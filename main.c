@@ -2,19 +2,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <ctype.h>
 #include "card_utils.h"
 #ifdef _WIN32
 #include <windows.h>
 #endif
-
-int end_game = -1;
 
 // win conditions
 #define NO_WIN (-1)
 #define HAS_14 0
 #define HAS_31 1
 #define OVER_31 2
+// colors
 #define RED     "\033[31m"
 #define BLACK   "\033[90m"
 #define GREEN  "\033[32m"
@@ -129,11 +127,6 @@ void run(int *total_money, card *players[], int player_count) {
     print_cards(players[0], player_len[0], 0);
 
     for (int i = 1; i < player_count; i++) {
-
-    }
-
-
-    for (int i = 1; i < player_count; i++) {
         players[i] = NULL;
         player_len[i] = 0;
         draw(deck, &players[i], &player_len[i],i,&ace_count[i],&ace_last_val[i]);
@@ -145,8 +138,11 @@ void run(int *total_money, card *players[], int player_count) {
             }
             fast_printf("How much to wager? Total money:");
             printf( "%d\n", total_money[i]);
-            scanf("%d", &wagers[i]);
-        } while (wagers[i] > total_money[i]);
+            if (scanf("%d", &wagers[i]) == 0) {
+                while (getchar() != '\n');
+                    wagers[i] = -1;
+            }
+        } while ((wagers[i] > total_money[i]) || wagers[i] < 0 );
         total_money[i] -= wagers[i];
     }
     int win = NO_WIN;
