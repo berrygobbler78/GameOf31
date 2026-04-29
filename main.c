@@ -135,7 +135,7 @@ void run(int *total_money, card *players[], int player_count) {
             printf( "%d\n", total_money[i]);
             if (scanf("%d", &wagers[i]) == 0) {
                 while (getchar() != '\n');
-                    wagers[i] = -1;
+                wagers[i] = -1;
             }
         } while ((wagers[i] > total_money[i]) || wagers[i] < 0 );
         total_money[i] -= wagers[i];
