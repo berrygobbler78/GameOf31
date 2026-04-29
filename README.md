@@ -1,0 +1,42 @@
+# Documentation:
+
+## William Garis' contributions:
+- **Deck creation:**`init`
+  - To create a new deck, the `init` function is called with the parameters of an array of cards.
+  - For each of the suits: hearts, clubs, spades, and diamonds, the `assign_suit` function is called, with the index at which the suit will start.
+  - The `assign_suit` function assigns 13 cards their corresponding values, with one king, queen, and jack.
+  - Then, the deck is shuffled: Two `int` variables are created with a random position from 0 - 52 using the `rand()` function (which is randomized with `srand(time(0))`) and the two cards are swapped
+- **Drawing a card**`draw`
+  - First, a new "hand" is created by reallocating the given hand to a size of the hand length + 1.
+  - That hand is assigned to the current hand to allow an extra card to be add.
+  - Next a for loop picks a random card in the deck. A while loop checks if the value of the card is equal to `DRAWN` or `-1`, which indicates the card has already been picked.
+  - The program then checks for aces, and if found, prompts the user to select either 1 or 11 for the value.
+    - Fernando worked on ace count \\/
+  - The card drawn is then given a value of `DRAWN` and is added to the last slot of the hand.
+- **Check for win condition:** `check_hand`
+  - The `check_hand` function checks the `hand_value` against the multiple conditions that a deck value can be and returns a defined value for each condition:
+    - `if (total == 31) return HAS_31;`
+    - `if (total == 14) return HAS_14;`
+    - `if (total > 31) return OVER_31;`
+    - `else return NO_WIN;`
+
+- **Printing a hand:** `print_cards`
+  - Although Fernando created the framework for the graphics, they printed on seperate 'lines' so it was difficult to see the entire hand.
+  - To print them side by side, I seperated each of the components of the card graphic to print them side by side.
+  - For the top: 
+    - for each card: `┌─────┐` is printed 
+  - For each top-middle: 
+    - if the player is the dealer: 
+      - a blank (`│     │`) is printed 
+    - if the player is not the dealer:
+      - if it is a face card: `│%c    │` is printed with `%c` being the first letter of the face card
+      - if it not a face card: `│%d    │` is printed with the value of the card
+  - For each middle:
+    - if the player is the dealer: 
+      - blank section printed
+    - if the player is not the dealer:
+      - depending on the suit, a symbol representing the suit is printed with `│  %s  │`, where `%s` is the symbol
+  - For each bottom middle:
+    - follows the same as top middle but reversed
+  - For each bottom:
+    - `└─────┘` is printed
