@@ -172,11 +172,7 @@ void print_cards(const card *cards, const int len, int player) {
     fast_printf(" cards(s)\n");
 }
 
-/*void print_value(card *cards, int len) {
-    printf("Total value: %d\n", hand_value(cards, len));
-}*/
-/* Help with this pls don't know why it's not working*/
-void revealLastCard(card cards[], int dealerVal) {
+void dealer_reveal(card cards[], int dealerVal) {
     const char *icon;
     if (strcmp(cards[0].suit, HEARTS) == 0) icon = RED "♥" RESET;
     else if (strcmp(cards[0].suit, CLUBS) == 0) icon = "♣";
@@ -186,16 +182,16 @@ void revealLastCard(card cards[], int dealerVal) {
     int hand = cards[0].value;
     if (hand == 10) {
         printf("%s\n│%d   │\n│  %s  │\n│   %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
-        fast_printf("Dealer's last card.\n");
+        fast_printf("Dealer's hidden card.\n");
         return;
     }
     if (hand == 11) {
         printf("%s\n│%c    │\n│  %s  │\n│    %c│\n%s\n",TOP,'A',icon,'A',BOTTOM);
-        fast_printf("Dealer's last card.\n");
+        fast_printf("Dealer's hidden card.\n");
         return;
     }
     printf("%s\n│%d    │\n│  %s  │\n│    %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
-    fast_printf("Dealer's last card.\n" RED "Dealer's total Value: ");
+    fast_printf("Dealer's hidden card.\n" RED "Dealer's total Value: ");
     printf("%d\n" RESET,dealerVal);
 
 }
