@@ -63,17 +63,16 @@ void assign_suit(card *deck, const char *suit, const int index) {
         deck[i].value = 1 + i - index;
     }
 
-    i++;
     strcpy(deck[i].suit, suit);
     strcpy(deck[i].face, JACK);
     deck[i].value = 10;
-
     i++;
+
     strcpy(deck[i].suit, suit);
     strcpy(deck[i].face, QUEEN);
     deck[i].value = 10;
-
     i++;
+
     strcpy(deck[i].suit, suit);
     strcpy(deck[i].face, KING);
     deck[i].value = 10;
