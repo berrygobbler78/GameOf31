@@ -12,6 +12,7 @@
 #define HAS_14 0
 #define HAS_31 1
 #define OVER_31 2
+
 // colors
 #define RED     "\033[31m"
 #define BLACK   "\033[90m"
@@ -23,10 +24,6 @@
 #define DRAWN (-1)
 
 void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,int *ace_last_val) {
-    if (*hand_len >= 52) {
-        printf("No more cards in the deck.\n");
-        return;
-    }
     card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
     *hand = temp_hand;
 
