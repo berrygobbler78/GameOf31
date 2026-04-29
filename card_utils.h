@@ -195,26 +195,10 @@ void dealer_reveal(card cards[], int dealerVal) {
     printf("%d\n" RESET,dealerVal);
 
 }
-/*
- * Still kind of confused who should win if dealer hits 14 or 31
- * Also if the player has 31 and so does the dealer who wins?
- * I feel like there should be a push option
- */
-void compare_cards(card *players[], int playerLen[], int money[], int wager[], int playerCount, int win) {
-    if (win == 1) {
-        for (int i = 1; i < playerCount; i++) {
-            money[i] += wager[i] * 2;
-        }
-        fast_printf("All players win!\n");
-        return;
-    }
-    int dealerVal = hand_value(players[0],playerLen[0]);
 
-    if (dealerVal == 31) {
-        fast_printf("Dealer wins, dealer got 31!\n");
-        return;
-    }
-    if (dealerVal != 14) revealLastCard(players[0],dealerVal);
+void compare_cards(card *players[], int playerLen[], int money[], int wager[], int playerCount) {
+    const int dealerVal = hand_value(players[0],playerLen[0]);
+    if (dealerVal != 14) dealer_reveal(players[0],dealerVal);
 
     for (int i = 1;i < playerCount;i++) {
         char buffer[100];
