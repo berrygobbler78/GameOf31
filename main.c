@@ -81,7 +81,7 @@ int dealer_turn(card *deck, card **hand, int *hand_len) {
             return HAS_31;
         }
         if (result == 14) {
-            fast_printf("Dealer hits 14, must stop.\n");
+            fast_printf("Dealer hits 14, players now must hit 31 to win.\n");
             print_cards(*hand, *hand_len, -1);  // Reveal all
             return HAS_14;
         }
