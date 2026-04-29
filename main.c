@@ -216,10 +216,11 @@ int main(void) {
     while (play == 'y') {
         run(total_money, players, player_count);
         do {
-            fast_printf("Would you like to play again? (y/n) ");
+            fast_printf("Would you like to play again? (y/n) \n");
             scanf(" %c", &play);
         } while (play != 'y' && play != 'n');
     }
+
     fast_printf("Goodbye...");
     delay(1000);
 
