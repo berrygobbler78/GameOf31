@@ -140,32 +140,47 @@ void run(int *total_money, card *players[], int player_count) {
         } while ((wagers[i] > total_money[i]) || wagers[i] < 0 );
         total_money[i] -= wagers[i];
     }
-    int win = NO_WIN;
-    if (dealer_turn(deck,&players[0],&player_len[0]) == OVER_31) win = 1;
-    int playerBreak;
+
+    int player_win = NO_WIN;
+    const int dealer_win = dealer_turn(deck,&players[0],&player_len[0]);
     char buffer[50];
+
+    switch (dealer_win) {
+        case NO_WIN: case HAS_14: break;
+        case OVER_31:
+            for (int i = 1; i < player_count; i++) total_money[i] += wagers[i] * 2;
+            fast_printf("All players win!\n");
+            return;
+        case HAS_31:
+            fast_printf("Dealer wins, dealer got 31!\n");
+            return;
+        default:
+    }
+
     for (int i = 1; i < player_count; i++){
-        if (win != -1) break;
+        if (player_win != NO_WIN) break;
+
         printf("--------------------\n");
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn!\n" RESET,i);
         fast_printf(buffer);
+
         while (1) {
             draw(deck, &players[i], &player_len[i],i,&ace_count[i],&ace_last_val[i]);
 
-            playerBreak = check_hand(players[i], player_len[i]);
+            player_win = check_hand(players[i], player_len[i]);
 
             print_cards(players[i], player_len[i], i);
             fast_printf( GREEN "Total Value: " RESET);
             printf(GREEN "%d\n" RESET, hand_value(players[i], player_len[i]));
 
-            if (playerBreak != -1) break;
+            if (player_win != NO_WIN) break;
 
             int temp;
             fast_printf("Continue? (1 for yes, 0 for no)\n");
             if (scanf("%d", &temp) == 0 || temp == 0) break;
         }
 
-        switch (playerBreak) {
+        switch (player_win) {
             case OVER_31:
                 snprintf(buffer,sizeof(buffer),RED "Player %d busts" RESET,i);
                 fast_printf(buffer);
@@ -180,10 +195,17 @@ void run(int *total_money, card *players[], int player_count) {
                 break;
             default: ;
         }
+
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
         fast_printf(buffer);
     }
-    compare_cards(players, player_len, total_money, wagers, player_count,win);
+
+    if (dealer_win == HAS_14 && player_win != HAS_31) {
+        fast_printf("Dealer wins, dealer got 14 and player did not hit 31!\n");
+        return;
+    }
+
+    compare_cards(players, player_len, total_money, wagers, player_count);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
 
