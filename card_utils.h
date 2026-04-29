@@ -49,37 +49,39 @@ void fast_printf(const char *message) {
 }
 
 void assign_suit(card *deck, const char *suit, const int index) {
-    int king = 0, queen = 0, jack = 0;
+    int i;
 
-    for (int i = index; i < index + 13; i++) {
+    // ace
+    strcpy(deck[index].suit, suit);
+    strcpy(deck[index].face, ACE);
+    deck[index].value = 1;
+
+    // 2 - 10
+    for (i = index + 1; i < index + 10; i++) {
         strcpy(deck[i].suit, suit);
+        strcpy(deck[i].face, NONE);
         deck[i].value = 1 + i - index;
-        if (deck[i].value > 10) {
-            deck[i].value = 10;
-            if (jack == 0) {
-                jack++;
-                strcpy(deck[i].face, JACK);
-                continue;
-            }
-            if (queen == 0) {
-                queen++;
-                strcpy(deck[i].face, QUEEN);
-                continue;
-            }
-            if (king == 0) {
-                king++;
-                strcpy(deck[i].face, KING);
-            }
-        }
-        else if (deck[i].value == 1) strcpy(deck[i].face, ACE);
-        else strcpy(deck[i].face, NONE);
     }
+
+    i++;
+    strcpy(deck[i].suit, suit);
+    strcpy(deck[i].face, JACK);
+    deck[i].value = 10;
+
+    i++;
+    strcpy(deck[i].suit, suit);
+    strcpy(deck[i].face, QUEEN);
+    deck[i].value = 10;
+
+    i++;
+    strcpy(deck[i].suit, suit);
+    strcpy(deck[i].face, KING);
+    deck[i].value = 10;
 }
 
 void shuffle_deck(card *deck) {
     for (int i = 0; i < 52; i++) {
         const int oldPos = rand() % 52, newPos = rand() % 52;
-
         const card temp = deck[oldPos];
         deck[oldPos] = deck[newPos];
         deck[newPos] = temp;
