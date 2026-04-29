@@ -95,14 +95,12 @@ int dealer_turn(card *deck, card **hand, int *hand_len) {
     }
 }
 
-int check_hand(const card *hand, int hand_len) {
-    int total = 0;
-    for (int i = 0; i < hand_len; i++) total += hand[i].value;
+int check_hand(const card *hand, const int hand_len) {
+    const int total = hand_value(hand, hand_len);
 
     if (total == 31) return HAS_31;
     if (total == 14) return HAS_14;
     if (total > 31) return OVER_31;
-
     return NO_WIN;
 }
 
