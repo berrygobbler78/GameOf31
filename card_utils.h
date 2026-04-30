@@ -6,12 +6,12 @@
 
 #ifndef GAMEOF31_CARD_UTILS_H
 #define GAMEOF31_CARD_UTILS_H
+
 // colors
 #define RED     "\033[31m"
 #define BLACK   "\033[90m"
 #define GOLD   "\033[33m"
 #define RESET   "\033[0m"
-
 
 // default card vals
 const char ACE[] = "ace", KING[] = "king", QUEEN[] = "queen", JACK[] = "jack", NONE[] = "none";
@@ -25,13 +25,10 @@ typedef struct card_s {
     int value;
 } card;
 
-void delay(int milliseconds)
-{
+void delay(const int milliseconds) {
     clock_t then;
-
-    long pause = milliseconds * (CLOCKS_PER_SEC / 1000);
     clock_t now = then = clock();
-    while( (now-then) < pause ) now = clock();
+    while( (now-then) < milliseconds * (CLOCKS_PER_SEC / 1000) ) now = clock();
 }
 
 void fast_printf(const char *message) {
@@ -51,7 +48,6 @@ void fast_printf(const char *message) {
 void assign_suit(card *deck, const char *suit, const int index) {
     int i;
 
-    // ace
     strcpy(deck[index].suit, suit);
     strcpy(deck[index].face, ACE);
     deck[index].value = 1;
@@ -95,7 +91,7 @@ void init(card deck[]){
     shuffle_deck(deck);
 }
 
-int hand_value(const card *hand, int len){
+int hand_value(const card *hand, const int len){
     int sum = 0;
     for(int i = 0 ;i < len;i++){
         sum += hand[i].value;
@@ -103,7 +99,7 @@ int hand_value(const card *hand, int len){
     return sum;
 }
 
-void print_cards(const card *cards, const int len, int player) {
+void print_cards(const card *cards, const int len, const int player) {
     printf("\n");
     for (int i = 0; i < len; i++) {
         printf("%s ", TOP);
@@ -167,6 +163,7 @@ void print_cards(const card *cards, const int len, int player) {
         fast_printf("Dealer's card(s)\n");
         return;
     }
+
     fast_printf("Player ");
     printf("%d's",player);
     fast_printf(" cards(s)\n");
@@ -174,12 +171,14 @@ void print_cards(const card *cards, const int len, int player) {
 
 void dealer_reveal(card cards[], int dealerVal) {
     const char *icon;
+
     if (strcmp(cards[0].suit, HEARTS) == 0) icon = RED "♥" RESET;
     else if (strcmp(cards[0].suit, CLUBS) == 0) icon = "♣";
     else if (strcmp(cards[0].suit, SPADES) == 0) icon = "♠";
     else if (strcmp(cards[0].suit, DIAMONDS) == 0) icon = RED "♦" RESET;
     else icon = "?";
-    int hand = cards[0].value;
+
+    const int hand = cards[0].value;
     if (hand == 10) {
         printf("%s\n│%d   │\n│  %s  │\n│   %d│\n%s\n",TOP,hand,icon,hand,BOTTOM);
         fast_printf("Dealer's hidden card.\n");
@@ -196,7 +195,7 @@ void dealer_reveal(card cards[], int dealerVal) {
 
 }
 
-void compare_cards(card *players[], int playerLen[], int money[], int wager[], int playerCount) {
+void compare_cards(card *players[], int playerLen[], int money[], const int wager[], const int playerCount) {
     const int dealerVal = hand_value(players[0],playerLen[0]);
     if (dealerVal != 14) dealer_reveal(players[0],dealerVal);
 
@@ -207,11 +206,11 @@ void compare_cards(card *players[], int playerLen[], int money[], int wager[], i
             snprintf(buffer,sizeof(buffer), GOLD "Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n" RESET,i,hand,i);
             fast_printf(buffer);
             money[i] += wager[i] * 2;
-        }else if (hand < 32 && hand > dealerVal) {
+        } else if (hand < 32 && hand > dealerVal) {
             snprintf(buffer,sizeof(buffer),GOLD "Player %d beats the dealer %d vs %d!\n" RESET,i,hand,dealerVal);
             fast_printf(buffer);
             money[i] += wager[i] * 2;
-        }else {
+        } else {
             snprintf(buffer,sizeof(buffer),RED "Player %d loses to the dealer %d vs %d!\n" RESET, i,dealerVal, hand);
             fast_printf(buffer);
         }

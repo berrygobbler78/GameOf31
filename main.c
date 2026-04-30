@@ -36,19 +36,18 @@ void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,
     } while (temp.value == DRAWN);
 
     if (strcmp(temp.face, ACE) == 0) {
-        // TODO: Add better interface for picking Ace val
-        if (playerNum == 0) {
-            int current = hand_value(*hand, *hand_len);
-            temp.value = (current + 11 <= 31) ? 11 : 1;
-        }
+        if (playerNum == 0) temp.value = (hand_value(*hand, *hand_len) + 11 <= 31) ? 11 : 1;
+
         else if (*ace_count % 2 == 0) {
             int input;
             char buffer[100];
+
             do {
                 snprintf(buffer,sizeof(buffer),GOLD "Player %d pulled an ACE! Enter value for ACE (1 or 11): " RESET,playerNum);
                 fast_printf(buffer);
                 scanf("%d", &input);
             } while (input != 1 && input != 11);
+
             temp.value = input;
             *ace_last_val = input;
             (*ace_count)++;
@@ -56,7 +55,6 @@ void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,
             temp.value = (*ace_last_val == 11) ? 1 : 11;
             (*ace_count)++;
         }
-
     }
 
     deck[val].value = DRAWN;
@@ -66,20 +64,23 @@ void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,
 
 int dealer_turn(card *deck, card **hand, int *hand_len) {
     fast_printf("Dealer's turn... | ");
+
     while (1) {
         draw(deck, hand, hand_len,0,0,0);
-        int result = hand_value(*hand,*hand_len);
+        const int result = hand_value(*hand,*hand_len);
 
         if (result > 31) {
             fast_printf(GOLD "Dealer busts! All players win!\n" RESET);
             print_cards(*hand, *hand_len, -1);
             return OVER_31;
         }
+
         if (result == 31) {
             fast_printf("Dealer hits 31!\n");
             print_cards(*hand, *hand_len, -1);
             return HAS_31;
         }
+
         if (result == 14) {
             fast_printf("Dealer hits 14, players now must hit 31 to win.\n");
             print_cards(*hand, *hand_len, -1);  // Reveal all
@@ -131,13 +132,16 @@ void run(int *total_money, card *players[], int player_count) {
                 fast_printf("Looks like you're broke! Here's 1 dollar to keep going!\n");
                 total_money[i] += 1;
             }
+
             fast_printf("How much to wager? Total money:");
             printf( "%d\n", total_money[i]);
+
             if (scanf("%d", &wagers[i]) == 0) {
                 while (getchar() != '\n');
                 wagers[i] = -1;
             }
-        } while ((wagers[i] > total_money[i]) || wagers[i] < 0 );
+
+        } while (wagers[i] > total_money[i] || wagers[i] < 0 );
         total_money[i] -= wagers[i];
     }
 
@@ -146,15 +150,14 @@ void run(int *total_money, card *players[], int player_count) {
     char buffer[50];
 
     switch (dealer_win) {
-        case NO_WIN: case HAS_14: break;
+        case HAS_31:
+            fast_printf("Dealer wins, dealer got 31!\n");
+            return;
         case OVER_31:
             for (int i = 1; i < player_count; i++) total_money[i] += wagers[i] * 2;
             fast_printf("All players win!\n");
             return;
-        case HAS_31:
-            fast_printf("Dealer wins, dealer got 31!\n");
-            return;
-        default:
+        default: break;
     }
 
     for (int i = 1; i < player_count; i++){
@@ -193,7 +196,7 @@ void run(int *total_money, card *players[], int player_count) {
                 snprintf(buffer,sizeof(buffer),GOLD "Player %d hit 31" RESET,i);
                 fast_printf(buffer);
                 break;
-            default: ;
+            default: break;
         }
 
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
@@ -220,6 +223,7 @@ int main(void) {
     // player setup
     int player_count = 0;
     fast_printf("Welcome to " BLACK "GAME " RED "OF " BLACK "3" RED "1\n" RESET);
+
     do {
         fast_printf("Enter number of players:\n");
         scanf("%d", &player_count);
@@ -234,20 +238,18 @@ int main(void) {
         total_money[i] = 100;
     }
 
-    char play = 'y';
-    while (play == 'y') {
+    char play;
+    do {
         run(total_money, players, player_count);
+
         do {
             fast_printf("Would you like to play again? (y/n) \n");
             scanf(" %c", &play);
         } while (play != 'y' && play != 'n');
-    }
+    } while (play == 'y');
 
     fast_printf("Goodbye...");
     delay(1000);
 
     return 0;
 }
-
-
-
