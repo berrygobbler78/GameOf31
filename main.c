@@ -22,7 +22,11 @@
 
 
 #define DRAWN (-1)
-
+/*
+ * Draws a card to the dealers hand, takes in the deck, hand,
+ * amount of cards, the players ID number, the amount of aces
+ * in hand, and the player's last ace value
+ */
 void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,int *ace_last_val) {
     card *temp_hand = realloc(*hand, sizeof(card) * (*hand_len + 1));
     *hand = temp_hand;
@@ -61,7 +65,12 @@ void draw(card *deck, card **hand, int *hand_len, int playerNum, int *ace_count,
     (*hand)[*hand_len] = temp;
     *hand_len += 1;
 }
-
+/*
+ * The same as the draw function but specifically for the dealer
+ * has certain logic to hide the dealer's hand and if the dealer busts or not
+ * takes in the deck, hand, and amount of cards
+ * returns the dealer's card value situation
+ */
 int dealer_turn(card *deck, card **hand, int *hand_len) {
     fast_printf("Dealer's turn... | ");
 
@@ -95,7 +104,11 @@ int dealer_turn(card *deck, card **hand, int *hand_len) {
         }
     }
 }
-
+/*
+ * Checks if the players hand equals a certain value,
+ * takes in a players hand and the amount of cards in the hand
+ * returns the players hand value situation
+ */
 int check_hand(const card *hand, const int hand_len) {
     const int total = hand_value(hand, hand_len);
 
@@ -104,7 +117,10 @@ int check_hand(const card *hand, const int hand_len) {
     if (total > 31) return OVER_31;
     return NO_WIN;
 }
-
+/*
+ * Main game loop, takes in a players total money,
+ * player count, and each players cards
+ */
 void run(int *total_money, card *players[], int player_count) {
     // deck setup
     card deck[52];
@@ -201,17 +217,20 @@ void run(int *total_money, card *players[], int player_count) {
 
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
         fast_printf(buffer);
+        if (dealer_win == HAS_14 && player_win != HAS_31) {
+            fast_printf("Dealer wins, dealer got 14 and player did not hit 31!\n");
+            return;
+        }
     }
 
-    if (dealer_win == HAS_14 && player_win != HAS_31) {
-        fast_printf("Dealer wins, dealer got 14 and player did not hit 31!\n");
-        return;
-    }
+
 
     compare_cards(players, player_len, total_money, wagers, player_count);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
-
+/*
+ * Main function, asks for number of players and whether or not they want to play again
+ */
 int main(void) {
     #ifdef _WIN32
     SetConsoleOutputCP(65001);  // UTF-8

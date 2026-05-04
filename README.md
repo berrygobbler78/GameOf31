@@ -40,3 +40,29 @@
     - follows the same as top middle but reversed
   - For each bottom:
     - `└─────┘` is printed
+## Fernando Campuzano's Contributions:
+- **Main Game Loop** `run`
+  - Both William and I contributed to this function which is the brain of the game.
+  - This function starts by taking in the number of players, then showing them their first card and having them wager an amount
+  - If the player is fully out of money, they are granted 1 dollar to continue.
+  - Each player gets to choose to continue drawing cards or not and once every turn is over, `compare_cards` is called.
+  - At the end the system asks the player to continue or end the game.
+- **Dealer Logic** `dealer_turn`
+  - Dealer's Logic had to be separated into a different function for it to be automated.
+  - Dealer uses the same function `draw` but has special conditions on when to pull or not
+  - The code in the logic states that if the total value of the dealer is less than 26 it will keep pulling cards
+  - The function returns 4 scenarios, either `NO_WIN`,`OVER_31`,`HAS_31`,`HAS_14` based on the value of the dealers hand
+- **Printing Cards** `print_cards`
+  - My contribution to this was the graphics, I designed the first prototype of this function and William improved it by drawing side by side
+- **Drawing Contributions** `draw`
+  - My contributions to this function was keeping track of the players' ace count
+  - We use this to switch what value of ace they get, so if in the beginning they choose `11`, their next ace is worth `1`.
+- **Player Cards Value** `hand_value`
+  - Implemented this function to take in the player's cards and the amount of cards a player has and returns the value
+- **Revealing Last Card** `dealer_reveal`
+  - This function was made solely to reveal the face down card of the dealer, it is only called in special conditions, it is only called inside the `compare_cards` function
+- **Final Compare** `compare_cards`
+  - Takes in every variable that is used to play the game
+  - Uses `hand_value`, `dealer_reveal`, and `fast_printf`
+  - For each player, it determines whether or not each player beats the dealer by circumstances that were explained
+  - If the player wins, their respective wager is doubled and returned back to the player by calling `money[i] = wager[i] * 2`
