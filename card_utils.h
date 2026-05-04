@@ -228,7 +228,18 @@ void compare_cards(card *players[], int playerLen[], int money[], const int wage
     for (int i = 1;i < playerCount;i++) {
         char buffer[100];
         const int hand = hand_value(players[i],playerLen[i]);
-        if ((hand == 14 || hand == 31) && dealerVal != 14) {
+        if (dealerVal == 14) {
+            if (hand == 31) {
+                snprintf(buffer,sizeof(buffer),GOLD "Dealer has 14 and player has 31! Player %d wins!\n" RESET,i);
+                fast_printf(buffer);
+                money[i] += wager[i] * 2;
+
+            }else {
+                snprintf(buffer,sizeof(buffer),RED "Dealer has 14 and player does not have 31, Dealer wins against Player %d\n" RESET,i);
+                fast_printf(buffer);
+            }
+        }
+        else if ((hand == 14 || hand == 31)) {
             snprintf(buffer,sizeof(buffer), GOLD "Player %d has %d and dealer does not have 14, Player %d beats the dealer!\n" RESET,i,hand,i);
             fast_printf(buffer);
             money[i] += wager[i] * 2;

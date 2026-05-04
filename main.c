@@ -177,7 +177,7 @@ void run(int *total_money, card *players[], int player_count) {
     }
 
     for (int i = 1; i < player_count; i++){
-        if (player_win != NO_WIN) break;
+
 
         printf("--------------------\n");
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn!\n" RESET,i);
@@ -212,15 +212,16 @@ void run(int *total_money, card *players[], int player_count) {
                 snprintf(buffer,sizeof(buffer),GOLD "Player %d hit 31" RESET,i);
                 fast_printf(buffer);
                 break;
-            default: break;
+            default:break;
         }
 
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
         fast_printf(buffer);
+        /*
         if (dealer_win == HAS_14 && player_win != HAS_31) {
             fast_printf("Dealer wins, dealer got 14 and player did not hit 31!\n");
             return;
-        }
+        }*/
     }
 
 
