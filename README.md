@@ -1,14 +1,14 @@
 # Documentation:
-
+Link to GitHub: https://github.com/berrygobbler78/GameOf31
 ## William Garis' contributions:
 - **Deck creation:**`init`
   - To create a new deck, the `init` function is called with the parameters of an array of cards.
   - For each of the suits: hearts, clubs, spades, and diamonds, the `assign_suit` function is called, with the index at which the suit will start.
   - The `assign_suit` function assigns 13 cards their corresponding values, with one king, queen, and jack.
-  - Then, the deck is shuffled: Two `int` variables are created with a random position from 0 - 52 using the `rand()` function (which is randomized with `srand(time(0))`) and the two cards are swapped
+  - Then, the deck is shuffled: Two `int` variables are created with a random position from 0 to 52 using the `rand()` function (which is randomized with `srand(time(0))`) and the two cards are swapped
 - **Drawing a card**`draw`
   - First, a new "hand" is created by reallocating the given hand to a size of the hand length + 1.
-  - That hand is assigned to the current hand to allow an extra card to be add.
+  - That hand is assigned to the current hand to allow an extra card to be added.
   - Next a for loop picks a random card in the deck. A while loop checks if the value of the card is equal to `DRAWN` or `-1`, which indicates the card has already been picked.
   - The program then checks for aces, and if found, prompts the user to select either 1 or 11 for the value.
     - Fernando worked on ace count \\/
@@ -21,8 +21,8 @@
     - `else return NO_WIN;`
 
 - **Printing a hand:** `print_cards`
-  - Although Fernando created the framework for the graphics, they printed on seperate 'lines' so it was difficult to see the entire hand.
-  - To print them side by side, I seperated each of the components of the card graphic to print them side by side.
+  - Although Fernando created the framework for the graphics, they printed on separate 'lines' so it was difficult to see the entire hand.
+  - To print them side by side, I separated each of the components of the card graphic to print them side by side.
   - For the top: 
     - for each card: `┌─────┐` is printed 
   - For each top-middle: 
