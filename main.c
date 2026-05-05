@@ -22,6 +22,7 @@
 
 
 #define DRAWN (-1)
+
 /*
  * Draws a card to the dealers hand, takes in the deck, hand,
  * amount of cards, the players ID number, the amount of aces
@@ -119,7 +120,7 @@ int check_hand(const card *hand, const int hand_len) {
 }
 /*
  * Main game loop, takes in a players total money,
- * player count, and each players cards
+ * player count, and each player's cards
  */
 void run(int *total_money, card *players[], int player_count) {
     // deck setup
@@ -178,7 +179,6 @@ void run(int *total_money, card *players[], int player_count) {
 
     for (int i = 1; i < player_count; i++){
 
-
         printf("--------------------\n");
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn!\n" RESET,i);
         fast_printf(buffer);
@@ -212,7 +212,7 @@ void run(int *total_money, card *players[], int player_count) {
                 snprintf(buffer,sizeof(buffer),GOLD "Player %d hit 31" RESET,i);
                 fast_printf(buffer);
                 break;
-            default:break;
+            default: break;
         }
 
         snprintf(buffer,sizeof(buffer), BLACK "\nPlayer %d's turn is over!\n" RESET,i);
@@ -224,13 +224,12 @@ void run(int *total_money, card *players[], int player_count) {
         }*/
     }
 
-
-
     compare_cards(players, player_len, total_money, wagers, player_count);
     for (int i = 0; i < player_count; i++) free(players[i]);
 }
+
 /*
- * Main function, asks for number of players and whether or not they want to play again
+ * Main function, asks for number of players runs game depending on whether they want to play again
  */
 int main(void) {
     #ifdef _WIN32
@@ -238,7 +237,7 @@ int main(void) {
     SetConsoleCP(65001); //AI-Generated, icons work on Linux but not windows
     #endif
 
-    srand(time(0));
+    srand(time(0)); // Randomizes seed so it should be different each game
 
     // player setup
     int player_count = 0;

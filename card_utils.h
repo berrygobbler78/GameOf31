@@ -24,6 +24,7 @@ typedef struct card_s {
     char suit[9], face[9];
     int value;
 } card;
+
 /*
  * Delay function used for the fast print and to delay the end in main
  * takes in milliseconds to delay
@@ -33,6 +34,7 @@ void delay(const int milliseconds) {
     clock_t now = then = clock();
     while( (now-then) < milliseconds * (CLOCKS_PER_SEC / 1000) ) now = clock();
 }
+
 /*
  * Similar to printf, prints characters from left to right sequentially instead of instantly
  * takes in a message
@@ -51,6 +53,9 @@ void fast_printf(const char *message) {
     }
 }
 
+/*
+ * For an input index, the next 13 cards are assigned with the given suit and values
+ */
 void assign_suit(card *deck, const char *suit, const int index) {
     int i;
 
@@ -79,6 +84,7 @@ void assign_suit(card *deck, const char *suit, const int index) {
     strcpy(deck[i].face, KING);
     deck[i].value = 10;
 }
+
 /*
  * Shuffles the deck randomly
  * takes in the deck
@@ -91,6 +97,7 @@ void shuffle_deck(card *deck) {
         deck[newPos] = temp;
     }
 }
+
 /*
  * Initializes the cards and assigns the suits
  * takes in the deck
@@ -102,6 +109,7 @@ void init(card deck[]){
     assign_suit(deck, "diamonds", 39);
     shuffle_deck(deck);
 }
+
 /*
  * Calculates the value of the hand
  * takes in the hand and the amount of cards in hand
@@ -114,6 +122,7 @@ int hand_value(const card *hand, const int len){
     }
     return sum;
 }
+
 /*
  * Prints cards to the screen side by side
  * takes in the cards, the amount of cards, and the player ID
@@ -187,6 +196,7 @@ void print_cards(const card *cards, const int len, const int player) {
     printf("%d's",player);
     fast_printf(" cards(s)\n");
 }
+
 /*
  * Prints out the dealer's last card
  * takes in cards and the value of the dealer's hand
@@ -216,6 +226,7 @@ void dealer_reveal(card cards[], int dealerVal) {
     printf("%d\n" RESET,dealerVal);
 
 }
+
 /*
  * Compares the player's card to the dealers cards, prints out each situation and adds money to player accordingly
  * takes in the players cards, the amount of cards each player has, the total money for each player,
